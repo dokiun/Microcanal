@@ -168,3 +168,4 @@ Este caso está pensado como un estudio de microfluídica con evaporación en un
 ## Contacto / mantenimiento
 
 Este README es una referencia rápida para el uso y comprensión del caso. Si se modifica la geometría, condiciones de contorno, flujo de trabajo o modelo físico, conviene actualizar este documento junto con los archivos de configuración.
+
