@@ -1,0 +1,103 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2306                                  |
+|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    arch        "LSB;label=32;scalar=64";
+    class       volScalarField;
+    location    "0/solid";
+    object      p;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [1 -1 -2 0 0 0 0];
+
+internalField   uniform 1e5;
+
+boundaryField
+{
+    solidBottomAdiabatic
+    {
+        type fixedFluxPressure;
+        gradient        uniform 0;
+        value           uniform 1e5;
+    }
+
+    solidBottom
+    {
+        type fixedFluxPressure;
+        gradient        uniform 0;
+        value           uniform 1e5;
+    }
+
+    solidTop
+    {
+        type fixedFluxPressure;
+        gradient        uniform 0;
+        value           uniform 1e5;
+    }
+
+    solidLeft
+    {
+        type fixedFluxPressure;
+        gradient        uniform 0;
+        value           uniform 1e5;
+    }
+
+    solidRight
+    {
+        type fixedFluxPressure;
+        gradient        uniform 0;
+        value           uniform 1e5;
+    }
+
+    front
+    {
+        type fixedFluxPressure;
+        gradient        uniform 0;
+        value           uniform 1e5;
+    }
+
+    back
+    {
+        type fixedFluxPressure;
+        gradient        uniform 0;
+        value           uniform 1e5;
+    }
+
+    solidToFluidTop
+    {
+        type fixedFluxPressure;
+        gradient        uniform 0;
+        value           uniform 1e5;
+    }
+
+    solidToFluidBottom
+    {
+        type fixedFluxPressure;
+        gradient        uniform 0;
+        value           uniform 1e5;
+    }
+
+    solidToFluidLeft
+    {
+        type fixedFluxPressure;
+        gradient        uniform 0;
+        value           uniform 1e5;
+    }
+
+    solidToFluidRight
+    {
+        type fixedFluxPressure;
+        gradient        uniform 0;
+        value           uniform 1e5;
+    }
+}
+
+// ************************************************************************* //

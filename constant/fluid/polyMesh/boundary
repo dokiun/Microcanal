@@ -1,0 +1,75 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2406                                  |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      binary;
+    arch        "LSB;label=32;scalar=64";
+    class       polyBoundaryMesh;
+    location    "constant/fluid/polyMesh";
+    object      boundary;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+6
+(
+    inlet
+    {
+        type            patch;
+        nFaces          2475;
+        startFace       2924325;
+    }
+    outlet
+    {
+        type            patch;
+        nFaces          2475;
+        startFace       2926800;
+    }
+    fluidToSolidBottom
+    {
+        type            mappedWall;
+        inGroups        2(wall mappedPatch);
+        nFaces          13200;
+        startFace       2929275;
+        sampleMode      nearestPatchFace;
+        sampleRegion    solid;
+        samplePatch     solidToFluidBottom;
+    }
+    fluidToSolidLeft
+    {
+        type            mappedWall;
+        inGroups        2(wall mappedPatch);
+        nFaces          30000;
+        startFace       2942475;
+        sampleMode      nearestPatchFace;
+        sampleRegion    solid;
+        samplePatch     solidToFluidLeft;
+    }
+    fluidToSolidTop
+    {
+        type            mappedWall;
+        inGroups        2(wall mappedPatch);
+        nFaces          13200;
+        startFace       2972475;
+        sampleMode      nearestPatchFace;
+        sampleRegion    solid;
+        samplePatch     solidToFluidTop;
+    }
+    fluidToSolidRight
+    {
+        type            mappedWall;
+        inGroups        2(wall mappedPatch);
+        nFaces          30000;
+        startFace       2985675;
+        sampleMode      nearestPatchFace;
+        sampleRegion    solid;
+        samplePatch     solidToFluidRight;
+    }
+)
+
+// ************************************************************************* //

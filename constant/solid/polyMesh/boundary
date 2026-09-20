@@ -1,0 +1,112 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2406                                  |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      binary;
+    arch        "LSB;label=32;scalar=64";
+    class       polyBoundaryMesh;
+    location    "constant/solid/polyMesh";
+    object      boundary;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+11
+(
+    solidRight
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          38000;
+        startFace       2967040;
+    }
+    solidLeft
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          38000;
+        startFace       3005040;
+    }
+    solidBottomAdiabatic
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          4240;
+        startFace       3043040;
+    }
+    solidBottom
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          16960;
+        startFace       3047280;
+    }
+    solidTop
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          21200;
+        startFace       3064240;
+    }
+    front
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          2560;
+        startFace       3085440;
+    }
+    back
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          2560;
+        startFace       3088000;
+    }
+    solidToFluidBottom
+    {
+        type            mappedWall;
+        inGroups        2(wall mappedPatch);
+        nFaces          13200;
+        startFace       3090560;
+        sampleMode      nearestPatchFace;
+        sampleRegion    fluid;
+        samplePatch     fluidToSolidBottom;
+    }
+    solidToFluidLeft
+    {
+        type            mappedWall;
+        inGroups        2(wall mappedPatch);
+        nFaces          30000;
+        startFace       3103760;
+        sampleMode      nearestPatchFace;
+        sampleRegion    fluid;
+        samplePatch     fluidToSolidLeft;
+    }
+    solidToFluidTop
+    {
+        type            mappedWall;
+        inGroups        2(wall mappedPatch);
+        nFaces          13200;
+        startFace       3133760;
+        sampleMode      nearestPatchFace;
+        sampleRegion    fluid;
+        samplePatch     fluidToSolidTop;
+    }
+    solidToFluidRight
+    {
+        type            mappedWall;
+        inGroups        2(wall mappedPatch);
+        nFaces          30000;
+        startFace       3146960;
+        sampleMode      nearestPatchFace;
+        sampleRegion    fluid;
+        samplePatch     fluidToSolidRight;
+    }
+)
+
+// ************************************************************************* //

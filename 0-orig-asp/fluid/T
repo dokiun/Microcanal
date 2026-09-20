@@ -1,0 +1,86 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2312                                  |
+|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    arch        "LSB;label=32;scalar=64";
+    class       volScalarField;
+    location    "0/fluid";
+    object      T;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 0 0 1 0 0 0];
+
+internalField   uniform 372.15;
+
+boundaryField
+{
+    fluidToSolidTop
+    {
+        type            compressible::turbulentTemperatureRadCoupledMixed;
+        value           uniform 372.15;
+        Tnbr            T;
+        kappaMethod     fluidThermo;
+        qrNbr           none;
+        qr              none;
+        kappa           none;
+    }
+
+    fluidToSolidBottom
+    {
+        type            compressible::turbulentTemperatureRadCoupledMixed;
+        value           uniform 376;
+        Tnbr            T;
+        kappaMethod     fluidThermo;
+        qrNbr           none;
+        qr              none;
+        kappa           none;
+    }
+
+    fluidToSolidLeft
+    {
+        type            compressible::turbulentTemperatureRadCoupledMixed;
+        value           uniform 372.15;
+        Tnbr            T;
+        kappaMethod     fluidThermo;
+        qrNbr           none;
+        qr              none;
+        kappa           none;
+    }
+
+    fluidToSolidRight
+    {
+        type            compressible::turbulentTemperatureRadCoupledMixed;
+        value           uniform 372.15;
+        Tnbr            T;
+        kappaMethod     fluidThermo;
+        qrNbr           none;
+        qr              none;
+        kappa           none;
+    }
+
+    inlet
+    {
+        type            totalTemperature;
+        gamma           1.4;
+        T0              uniform 372.15;
+        value           uniform 372.15;
+        //type            fixedValue;
+        //value           uniform 372.15;
+    }
+
+    outlet
+    {	
+        type            zeroGradient;
+        value           uniform 372.15;
+    }
+}
+
+// ************************************************************************* //

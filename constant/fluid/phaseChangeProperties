@@ -1,0 +1,44 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  plus                                  |
+|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      interfaceModels;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+energySourceTermModel implicitGrad;
+
+massSourceTermModel hardtWondra;
+
+macroModel
+{
+    directEvaporation
+    {
+        type directEvaporation;
+        superheated 1;
+    }
+}
+
+
+satProperties
+{
+    singleComponentSatProp function;
+    Tmin 200;
+    Tmax 500;
+    pSat constant 101235;
+    TSat constant 373.15;
+    L constant 2.26e6;
+}
+
+
+
+// ************************************************************************* //

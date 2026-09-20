@@ -1,0 +1,101 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2406                                  |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      binary;
+    arch        "LSB;label=32;scalar=64";
+    class       volScalarField;
+    location    "0/solid";
+    object      T;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 0 0 1 0 0 0];
+
+internalField   uniform 375;
+
+boundaryField
+{
+    solidRight
+    {
+        type            zeroGradient;
+    }
+    solidLeft
+    {
+        type            zeroGradient;
+    }
+    solidBottomAdiabatic
+    {
+        type            zeroGradient;
+    }
+    solidBottom
+    {
+        type            externalWallHeatFluxTemperature;
+        mode            flux;
+        q               uniform 400000;
+        kappaMethod     solidThermo;
+        kappa           none;
+        value           uniform 375;
+    }
+    solidTop
+    {
+        type            zeroGradient;
+    }
+    front
+    {
+        type            zeroGradient;
+    }
+    back
+    {
+        type            zeroGradient;
+    }
+    solidToFluidBottom
+    {
+        type            compressible::turbulentTemperatureRadCoupledMixed;
+        Tnbr            T;
+        kappaMethod     solidThermo;
+        qrNbr           none;
+        qr              none;
+        kappa           none;
+        value           uniform 376;
+    }
+    solidToFluidLeft
+    {
+        type            compressible::turbulentTemperatureRadCoupledMixed;
+        Tnbr            T;
+        kappaMethod     solidThermo;
+        qrNbr           none;
+        qr              none;
+        kappa           none;
+        value           uniform 376;
+    }
+    solidToFluidTop
+    {
+        type            compressible::turbulentTemperatureRadCoupledMixed;
+        Tnbr            T;
+        kappaMethod     solidThermo;
+        qrNbr           none;
+        qr              none;
+        kappa           none;
+        value           uniform 376;
+    }
+    solidToFluidRight
+    {
+        type            compressible::turbulentTemperatureRadCoupledMixed;
+        Tnbr            T;
+        kappaMethod     solidThermo;
+        qrNbr           none;
+        qr              none;
+        kappa           none;
+        value           uniform 376;
+    }
+}
+
+
+// ************************************************************************* //

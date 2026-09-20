@@ -1,0 +1,116 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2406                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      probes;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+cuttingPlanesFluid
+{
+    type            surfaces;
+    libs            (sampling); // ( "libsampling.so" );
+    writeControl    adjustableRunTime; // runTime; // writeTime;
+    writeInterval   5.0e-5; // 1;
+    surfaceFormat   vtk;
+    writeFormat     binary; 
+
+    //formatOptions
+    //{
+    //    vtk
+    //    {
+    //        format  binary;
+    //    }
+    //}
+    
+    region          fluid;
+    fields          (p U alpha.water T);
+    //fields          (U T T.air T.water alpha.water alpha.air p)
+
+    interpolationScheme cellPoint;
+
+    surfaces
+    {
+        midplane_XZ
+        {
+            type        cuttingPlane;
+            planeType   pointAndNormal;
+            pointAndNormalDict
+            {
+                point   (0 150e-6 0);    
+                normal  (0 1 0);
+            }
+            interpolate true;
+        }
+        
+        midplane_YZ
+        {
+            type        cuttingPlane;
+            planeType   pointAndNormal;
+            pointAndNormalDict
+            {
+                point   (150e-6 0 0);
+                normal  (1 0 0);
+            }
+            interpolate true;
+        }
+    }
+}
+
+cuttingPlanesSolid
+{
+    type            surfaces;
+    libs            (sampling); // ( "libsampling.so" );
+    writeControl    adjustableRunTime; // runTime; // writeTime;
+    writeInterval   5.0e-5; // 1;
+    surfaceFormat   vtk;
+    writeFormat     binary; 
+
+    //formatOptions
+    //{
+    //    vtk
+    //    {
+    //        format  binary;
+    //    }
+    //}
+    
+    region          solid;
+    fields          (T);
+
+    interpolationScheme cellPoint;
+
+    surfaces
+    {
+        midplane_XZ
+        {
+            type        cuttingPlane;
+            planeType   pointAndNormal;
+            pointAndNormalDict
+            {
+                point   (0 150e-6 0);    
+                normal  (0 1 0);
+            }
+            interpolate true;
+        }
+        
+        midplane_YZ
+        {
+            type        cuttingPlane;
+            planeType   pointAndNormal;
+            pointAndNormalDict
+            {
+                point   (150e-6 0 0);
+                normal  (1 0 0);
+            }
+            interpolate true;
+        }
+    }
+}

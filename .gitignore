@@ -1,0 +1,27 @@
+# OpenFOAM simulation results
+/postProcessing/
+/processor*/
+/dynamicCode/
+
+# Generated time directories at the case root
+/[1-9]*/
+/[0-9]*.[0-9]*/
+/[0-9]*e[+-][0-9]*/
+
+# Logs and scheduler output
+log.*
+*.log
+slurm-*.out
+*.err
+*.out
+
+# Generated visualization and case marker files
+*.foam
+*.vtk
+*.vtp
+
+# Temporary files
+*~
+*.swp
+*.swo
+.DS_Store

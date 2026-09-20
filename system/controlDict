@@ -1,0 +1,124 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  plus                                  |
+|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     multiRegionPhaseChangeFlow;
+startFrom       latestTime;
+startTime       0;
+stopAt          endTime;
+endTime         0.0015; //0.042; //1.0;
+deltaT          1.00e-8;
+writeControl    adjustableRunTime;
+writeInterval   1.0e-4;
+purgeWrite      11;
+writeFormat     binary;
+writePrecision  8;
+writeCompression off;
+timeFormat      general;
+timePrecision   10;
+runTimeModifiable yes;
+adjustTimeStep  yes;
+maxCo           0.195;
+maxAlphaCo      0.195;
+maxDeltaT       5.00e-7; //4.00e-6;
+maxDi           50;
+maxCapillaryNum 1;
+
+libs
+(
+    "libpostProcess.so"
+    "libfluidThermo.so"
+	"libOpenFOAM.so"
+);
+
+functions
+{
+	#include "probes"
+    #include "cuttingPlanes"
+}
+
+
+//  cuttingPlane_XZ
+//  {
+//      type            surfaces;
+//      libs            (sampling);
+//      writeControl    runTime; // writeTime;
+//      writeInterval   2e-4; // 1;
+//
+//      surfaceFormat   vtk;
+//      fields          (p U alpha.water T T.air T.water);
+//
+//      surfaces
+//      {
+//          midplane_XZ
+//          {
+//              type        cuttingPlane;
+//              planeType   pointAndNormal;
+//              pointAndNormalDict
+//              {
+//                  point   (0 150e-6 0);    
+//                  normal  (0 1 0);
+//              }
+//              interpolate true;
+//          }
+//      }
+//  }
+//
+//  cuttingPlane_YZ
+//  {
+//      type            surfaces;
+//      libs            (sampling);
+//      writeControl    writeTime;
+//
+//      surfaceFormat   vtk;
+//      fields          (p U alpha.water T T.air T.water);
+//
+//      surfaces
+//      {
+//          midplane_YZ
+//          {
+//              type        cuttingPlane;
+//              planeType   pointAndNormal;
+//              pointAndNormalDict
+//              {
+//                  point   (150e-6 0 0);
+//                  normal  (1 0 0);
+//              }
+//              interpolate true;
+//          }
+//      }
+//  }
+//    intPsi
+//    {
+//        type            volFieldValue;
+//        libs            ("libfieldFunctionObjects.so");
+//
+//        writeControl    timeStep;
+//        writeInterval   1;
+//        writeFields     false;
+//        log             true;
+//        region          fluid;
+//
+//        operation       volIntegrate;
+//
+//        fields
+//        (
+//            psi0_
+//        );
+//
+//    }
+
+// ************************************************************************* //

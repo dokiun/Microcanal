@@ -1,0 +1,161 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2312                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+scale   0.001;  // coordenadas en mm
+
+
+// --- Microcanal: Dh = 200 µm, paredes Wf = Ht = 50 µm, L = 6 mm ---
+W_wall_left     0.05;   // Wf = Dh/4 = 50 µm
+W_channel       0.15;   // Dh = 200 µm
+
+H_wall_bottom   0.05;   // 50 µm
+H_channel       0.30;   // Dh = 200 µm
+
+L_total         6.0;    // La(1.2) + Lh(4.8) = 6 mm
+
+
+// --- Coordenadas ---
+X_start 0.05;   // = W_wall_left
+X_end   0.20;   // = W_wall_left + W_channel
+
+Y_start 0.05;   // = H_wall_bottom
+Y_end   0.35;   // = H_wall_bottom + H_channel
+
+Z_start 0;
+Z_end   6.0;
+
+
+// --- Resolución de malla ---
+Nx 33;
+Ny 75;
+Nz 400;
+
+
+
+vertices
+(
+    ($X_start $Y_start $Z_start)
+    ($X_end   $Y_start $Z_start)
+    ($X_end   $Y_end   $Z_start)
+    ($X_start $Y_end   $Z_start)
+
+    ($X_start $Y_start $Z_end)
+    ($X_end   $Y_start $Z_end)
+    ($X_end   $Y_end   $Z_end)
+    ($X_start $Y_end   $Z_end)
+);
+
+
+
+blocks
+(
+    hex (0 1 2 3 4 5 6 7) ($Nx $Ny $Nz) 
+    simpleGrading 
+    (
+	//x-Direction
+	(
+		(0.2 0.3 10)
+		(0.7 0.4 1)
+		(0.2 0.3 0.1)
+	)
+	//y-Direction
+	(
+		(0.2 0.3 10)
+		(0.7 0.4 1)
+		(0.2 0.3 0.1)
+	)
+	//z-Direction
+	1
+    )
+);
+
+
+
+edges
+(
+);
+
+
+
+boundary
+(
+
+    inlet
+    {
+        type patch;
+        faces
+        (
+            (0 1 2 3)
+        );
+    }
+
+    outlet
+    {
+        type patch;
+        faces
+        (
+            (4 5 6 7)
+        );
+    }
+
+
+    fluidToSolidBottom
+    {
+        type wall;
+        faces
+        (
+            (0 4 5 1)
+        );
+    }
+
+
+    fluidToSolidLeft
+    {
+        type wall;
+        faces
+        (
+            (1 5 6 2)
+        );
+    }
+
+
+    fluidToSolidTop
+    {
+        type wall;
+        faces
+        (
+            (2 6 7 3)
+        );
+    }
+
+
+    fluidToSolidRight
+    {
+        type wall;
+        faces
+        (
+            (3 7 4 0)
+        );
+    }
+
+);
+
+
+mergePatchPairs
+(
+);
+
+//// ************************************************************************* //
