@@ -1,0 +1,52 @@
+#!/bin/bash
+set -euo pipefail
+cd "$(dirname "$0")"
+
+# Requires an initialized OpenFOAM environment. The input STL is in mm.
+mkdir -p constant/triSurface logs
+surfaceCheck geometry/Microcanal.stl > logs/log.surfaceCheck 2>&1
+surfaceTransformPoints -read-scale 0.001 geometry/Microcanal.stl \
+    constant/triSurface/Microcanal_m.stl > logs/log.surfaceTransformPoints 2>&1
+surfaceFeatureExtract > logs/log.surfaceFeatureExtract 2>&1
+blockMesh > logs/log.blockMesh 2>&1
+snappyHexMesh -overwrite > logs/log.snappyHexMesh 2>&1
+topoSet > logs/log.topoSet 2>&1
+checkMesh -constant > logs/log.checkMesh.combined 2>&1
+grep -q 'Mesh OK' logs/log.checkMesh.combined
+python3 - <<'PY'
+from pathlib import Path
+import re
+text = Path('logs/log.checkMesh.combined').read_text()
+cells = int(re.search(r'^\s*cells:\s*(\d+)', text, re.M)[1])
+if cells >= 50000:
+    raise SystemExit(f'Limite excedido: {cells} celdas; se requieren menos de 50000.')
+print(f'Malla conjunta: {cells} celdas (< 50000).')
+PY
+
+# Rebuild regional mesh outputs without archiving generated meshes.
+for region in fluid solid; do
+    rm -rf "constant/$region/polyMesh"
+done
+splitMeshRegions -cellZonesOnly -overwrite > logs/log.splitMeshRegions 2>&1
+snappyHexMesh -region fluid -overwrite > logs/log.snappyHexMesh.layers 2>&1
+topoSet -region fluid -dict system/topoSetRefineDict > logs/log.topoSet.refineFluid 2>&1
+refineMesh -region fluid -overwrite > logs/log.refineMesh.fluid 2>&1
+for region in fluid solid; do
+    checkMesh -constant -region "$region" > "logs/log.checkMesh.$region" 2>&1
+    grep -q 'Mesh OK' "logs/log.checkMesh.$region"
+done
+python3 - <<'PY'
+from pathlib import Path
+import re
+counts = {
+    region: int(re.search(r'^\s*cells:\s*(\d+)',
+                         Path(f'logs/log.checkMesh.{region}').read_text(), re.M)[1])
+    for region in ('fluid', 'solid')
+}
+total = sum(counts.values())
+if total >= 50000:
+    raise SystemExit(f'Limite excedido tras las capas: {total} celdas.')
+print(f'Malla final con capas: {counts}, total {total} (< 50000).')
+PY
+touch Microcanal.foam
+echo 'Mallas fluid y solid generadas y verificadas. Ver logs/log.checkMesh.*'

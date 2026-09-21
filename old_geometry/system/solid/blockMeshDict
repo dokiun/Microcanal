@@ -1,0 +1,333 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2312                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+scale   0.001;  // coordenadas en mm
+
+
+// --- Microcanal: Dh = 200 µm, paredes Wf = Ht = 50 µm ---
+W_wall 0.05;     // Wf = Dh/4 = 50 µm
+W_fluido 0.15;   // Dh = 150 µm
+
+H_wall 0.05;     // Ht = Dh/4 = 50 µm
+H 0.30;          // Dh = 300 µm
+
+
+// --- Coordenadas (mm) ---
+X0 0;
+X1 0.05;    // = W_wall
+X2 0.20;    // = W_wall + W_fluido
+X3 0.25;    // = 2*W_wall + W_fluido
+
+Y0 0;
+Y1 0.05;    // = H_wall
+Y2 0.35;    // = H_wall + H
+Y3 0.40;    // = 2*H_wall + H
+
+Z0 0;
+Z_La 1.2;   // fin sección adiabática: La = 6*Dh = 1.2 mm
+Z1  6.0;    // fin total: La + Lh = 1.2 + 4.8 = 6 mm
+
+
+// --- Resolución ---
+Nx_wall  10;
+Nx_fluid 33;
+
+Ny_wall  10;
+Ny_fluid 75;
+
+Nz_La 80;   // 1.2/6.0 * 200 = 40 celdas (sección adiabática)
+Nz_Lh 320;  // 4.8/6.0 * 200 = 160 celdas (sección calentada)
+
+
+vertices
+(
+// ---- z = Z0 ----
+($X0 $Y0 $Z0)    //  0
+($X1 $Y0 $Z0)    //  1
+($X2 $Y0 $Z0)    //  2
+($X3 $Y0 $Z0)    //  3
+
+($X0 $Y1 $Z0)    //  4
+($X1 $Y1 $Z0)    //  5
+($X2 $Y1 $Z0)    //  6
+($X3 $Y1 $Z0)    //  7
+
+($X0 $Y2 $Z0)    //  8
+($X1 $Y2 $Z0)    //  9
+($X2 $Y2 $Z0)    // 10
+($X3 $Y2 $Z0)    // 11
+
+($X0 $Y3 $Z0)    // 12
+($X1 $Y3 $Z0)    // 13
+($X2 $Y3 $Z0)    // 14
+($X3 $Y3 $Z0)    // 15
+
+
+// ---- z = Z_La ----
+($X0 $Y0 $Z_La)  // 16
+($X1 $Y0 $Z_La)  // 17
+($X2 $Y0 $Z_La)  // 18
+($X3 $Y0 $Z_La)  // 19
+
+($X0 $Y1 $Z_La)  // 20
+($X1 $Y1 $Z_La)  // 21
+($X2 $Y1 $Z_La)  // 22
+($X3 $Y1 $Z_La)  // 23
+
+($X0 $Y2 $Z_La)  // 24
+($X1 $Y2 $Z_La)  // 25
+($X2 $Y2 $Z_La)  // 26
+($X3 $Y2 $Z_La)  // 27
+
+($X0 $Y3 $Z_La)  // 28
+($X1 $Y3 $Z_La)  // 29
+($X2 $Y3 $Z_La)  // 30
+($X3 $Y3 $Z_La)  // 31
+
+
+// ---- z = Z1 ----
+($X0 $Y0 $Z1)    // 32
+($X1 $Y0 $Z1)    // 33
+($X2 $Y0 $Z1)    // 34
+($X3 $Y0 $Z1)    // 35
+
+($X0 $Y1 $Z1)    // 36
+($X1 $Y1 $Z1)    // 37
+($X2 $Y1 $Z1)    // 38
+($X3 $Y1 $Z1)    // 39
+
+($X0 $Y2 $Z1)    // 40
+($X1 $Y2 $Z1)    // 41
+($X2 $Y2 $Z1)    // 42
+($X3 $Y2 $Z1)    // 43
+
+($X0 $Y3 $Z1)    // 44
+($X1 $Y3 $Z1)    // 45
+($X2 $Y3 $Z1)    // 46
+($X3 $Y3 $Z1)    // 47
+);
+
+
+// ============================================================
+// Bloques: 16 total (8 sección adiabática + 8 sección calentada)
+// ============================================================
+
+blocks
+(
+
+// ==== Sección ADIAATICA: z = Z0 -  Z_La ====
+
+hex (0 1 5 4  16 17 21 20)  ($Nx_wall  $Ny_wall  $Nz_La) simpleGrading (1 1 1)   // base-izq
+
+hex (1 2 6 5  17 18 22 21)  ($Nx_fluid $Ny_wall  $Nz_La) simpleGrading (1 1 1)   // base-centro (pared bajo canal)
+
+hex (2 3 7 6  18 19 23 22)  ($Nx_wall  $Ny_wall  $Nz_La) simpleGrading (1 1 1)   // base-der
+
+
+hex (8 9 13 12  24 25 29 28)   ($Nx_wall  $Ny_wall  $Nz_La) simpleGrading (1 1 1) // tapa-izq
+
+hex (9 10 14 13  25 26 30 29)  ($Nx_fluid $Ny_wall  $Nz_La) simpleGrading (1 1 1) // tapa-centro (pared sobre canal)
+
+hex (10 11 15 14  26 27 31 30) ($Nx_wall  $Ny_wall  $Nz_La) simpleGrading (1 1 1) // tapa-der
+
+
+hex (4 5 9 8  20 21 25 24)     ($Nx_wall  $Ny_fluid $Nz_La) simpleGrading (1 1 1) // pared lateral-izq
+
+hex (6 7 11 10  22 23 27 26)   ($Nx_wall  $Ny_fluid $Nz_La) simpleGrading (1 1 1) // pared lateral-der
+
+
+// ==== Sección CALENTADA: z = Z_La- Z1 ====
+
+hex (16 17 21 20  32 33 37 36)  ($Nx_wall  $Ny_wall  $Nz_Lh) simpleGrading (1 1 1)  // base-izq
+
+hex (17 18 22 21  33 34 38 37)  ($Nx_fluid $Ny_wall  $Nz_Lh) simpleGrading (1 1 1)  // base-centro (pared bajo canal)
+
+hex (18 19 23 22  34 35 39 38)  ($Nx_wall  $Ny_wall  $Nz_Lh) simpleGrading (1 1 1)  // base-der
+
+
+hex (24 25 29 28  40 41 45 44)  ($Nx_wall  $Ny_wall  $Nz_Lh) simpleGrading (1 1 1)  // tapa-izq
+
+hex (25 26 30 29  41 42 46 45)  ($Nx_fluid $Ny_wall  $Nz_Lh) simpleGrading (1 1 1)  // tapa-centro
+
+hex (26 27 31 30  42 43 47 46)  ($Nx_wall  $Ny_wall  $Nz_Lh) simpleGrading (1 1 1)  // tapa-der
+
+
+hex (20 21 25 24  36 37 41 40)  ($Nx_wall  $Ny_fluid $Nz_Lh) simpleGrading (1 1 1)  // pared lateral-izq
+
+hex (22 23 27 26  38 39 43 42)  ($Nx_wall  $Ny_fluid $Nz_Lh) simpleGrading (1 1 1)  // pared lateral-der
+
+);
+
+
+// ============================================================
+// Fronteras
+// ============================================================
+
+boundary
+(
+
+// ---- Caras exteriores laterales (simetría para canales adyacentes) ----
+
+solidRight
+{
+type wall;
+faces
+(
+(0 4 20 16)
+(4 8 24 20)
+(8 12 28 24)
+(16 20 36 32)
+(20 24 40 36)
+(24 28 44 40)
+);
+}
+
+solidLeft
+{
+type wall;
+faces
+(
+(3 7 23 19)
+(7 11 27 23)
+(11 15 31 27)
+(19 23 39 35)
+(23 27 43 39)
+(27 31 47 43)
+);
+}
+
+// ---- Cara exterior inferior ----
+// Sección ADIAATICA (z = 0 a 1.2 mm): sin flujo de calor
+solidBottomAdiabatic
+{
+type wall;
+faces
+(
+(0 1 17 16)
+(1 2 18 17)
+(2 3 19 18)
+);
+}
+
+// Sección CALENTADA (z = 1.2 a 6 mm): qw = 100 kW/m²
+solidBottom
+{
+type wall;
+faces
+(
+(16 17 33 32)
+(17 18 34 33)
+(18 19 35 34)
+);
+}
+
+// ---- Cara exterior superior ----
+solidTop
+{
+type wall;
+faces
+(
+(12 13 29 28)
+(13 14 30 29)
+(14 15 31 30)
+(28 29 45 44)
+(29 30 46 45)
+(30 31 47 46)
+);
+}
+
+// ---- Extremos axiales del sólido ----
+front
+{
+type wall;
+faces
+(
+(0 1 5 4)
+(1 2 6 5)
+(2 3 7 6)
+(4 5 9 8)
+(6 7 11 10)
+(8 9 13 12)
+(9 10 14 13)
+(10 11 15 14)
+);
+}
+
+back
+{
+type wall;
+faces
+(
+(32 33 37 36)
+(33 34 38 37)
+(34 35 39 38)
+(36 37 41 40)
+(38 39 43 42)
+(40 41 45 44)
+(41 42 46 45)
+(42 43 47 46)
+);
+}
+
+// ---- Interfaces sólio-fluido (mappedWall tras changeDictionary) ----
+
+solidToFluidBottom
+{
+type wall;
+faces
+(
+(5 6 22 21)     // sección La
+(21 22 38 37)   // sección Lh
+);
+}
+
+solidToFluidLeft
+{
+type wall;
+faces
+(
+(6 10 26 22)    // sección La
+(22 26 42 38)   // sección Lh
+);
+}
+
+solidToFluidTop
+{
+type wall;
+faces
+(
+(9 10 26 25)    // sección La
+(25 26 42 41)   // sección Lh
+);
+}
+
+solidToFluidRight
+{
+type wall;
+faces
+(
+(5 9 25 21)     // sección La
+(21 25 41 37)   // sección Lh
+);
+}
+
+);
+
+
+mergePatchPairs
+(
+);
+//// ************************************************************************* //

@@ -1,0 +1,40 @@
+FoamFile
+{
+    version 2.0;
+    format ascii;
+    class dictionary;
+    object snappyHexMeshDict;
+}
+// Add inflation layers only after splitting the fluid and solid regions.
+#include "../snappyHexMeshDict"
+
+castellatedMesh false;
+snap false;
+addLayers true;
+
+addLayersControls
+{
+    relativeSizes false;
+    layers
+    {
+        fluid_to_solid { nSurfaceLayers 3; }
+    }
+    firstLayerThickness 2e-6;
+    expansionRatio 1.25;
+    minThickness 1e-6;
+    nGrow 0;
+    featureAngle 130;
+    slipFeatureAngle 30;
+    nRelaxIter 5;
+    nSmoothSurfaceNormals 1;
+    nSmoothNormals 3;
+    nSmoothThickness 10;
+    maxFaceThicknessRatio 0.5;
+    maxThicknessToMedialRatio 0.3;
+    minMedialAxisAngle 90;
+    nBufferCellsNoExtrude 0;
+    nLayerIter 30;
+    nRelaxedIter 20;
+}
+
+writeFlags (layerSets);

@@ -1,0 +1,15 @@
+FoamFile
+{
+    version 2.0;
+    format ascii;
+    class dictionary;
+    object surfaceFeatureExtractDict;
+}
+
+// Microcanal_m.stl is generated from geometry/Microcanal.stl (mm -> m).
+Microcanal_m.stl
+{
+    extractionMethod extractFromSurface;
+    includedAngle 150;
+    writeObj yes;
+}

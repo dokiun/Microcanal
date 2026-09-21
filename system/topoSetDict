@@ -1,0 +1,16 @@
+FoamFile
+{
+    version 2.0;
+    format ascii;
+    class dictionary;
+    object topoSetDict;
+}
+// The STL defines solid. The rest of the rectangular envelope is fluid.
+actions
+(
+    { name fluidCells; type cellSet; action new;
+      source zoneToCell; zone solid; }
+    { name fluidCells; type cellSet; action invert; }
+    { name fluid; type cellZoneSet; action new;
+      source setToCellZone; set fluidCells; }
+);
