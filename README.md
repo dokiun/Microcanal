@@ -35,9 +35,45 @@ Ambas regiones pasan `checkMesh`. El script exige menos de **50 000 celdas** en 
 - `constant/fluid/polyMesh` y `constant/solid/polyMesh`: mallas finales.
 - `old_geometry/`: diccionarios de la geometría anterior, sin mallas generadas.
 
-## Ver en ParaView
+## Definición automática de las regiones sólido-fluido
 
-Abrir `Microcanal.foam` desde la raíz y seleccionar las regiones `fluid` y `solid`. Desmarcar los campos en **Cell Arrays** y **Point Arrays**, desactivar **Decompose polyhedra** y pulsar **Apply**. Usar **Surface With Edges** para ver las celdas.
+La geometría STL se utiliza para definir directamente la región sólida del dominio. En "snappyHexMeshDict", las celdas ubicadas dentro de la superficie cerrada del STL se asignan a la "cellZone" denominada "solid".
+
+Posteriormente, "topoSet" genera la región "fluid" como el complemento de la región sólida, es decir:
+
+fluid = todas las celdas del dominio - solid
+
+Finalmente, "splitMeshRegions -cellZonesOnly" utiliza las "cellZones" "solid" y "fluid" para generar las mallas independientes:
+
+constant/
+├── fluid/
+│   └── polyMesh/
+└── solid/
+    └── polyMesh/
+
+Esta estrategia permite cambiar fácilmente la geometría sólida sin redefinir manualmente la región fluida. Por ejemplo, el STL puede representar un perfil en T, una sección rectangular, un perfil rectangular hueco u otra geometría cerrada. En todos los casos, el material contenido por el STL se considera sólido y el volumen restante dentro del dominio de "blockMesh" se asigna al fluido.
+
+STL
+ │
+ ▼
+snappyHexMesh
+ │
+ └── cellZone: solid
+          │
+          ▼
+       topoSet
+          │
+          └── fluid = dominio - solid
+                    │
+                    ▼
+              cellZone: fluid
+                    │
+                    ▼
+        splitMeshRegions
+             /          \
+          fluid         solid
+
+Para que este procedimiento funcione correctamente, la geometría STL debe representar una superficie cerrada y válida, y "locationInMesh" debe encontrarse en una posición coherente con el dominio que se desea conservar.
 
 ## Estado del caso
 
