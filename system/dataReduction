@@ -1,0 +1,125 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2512                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+// ============================================================================
+// Reducción de datos y cálculo de promedios integrales según Ghani et al. (2017)
+//
+// 1. Delta P = P_in,ave - P_out,ave  (Ec. 10 y 18)
+// 2. T_base,ave = Promedio superficial en la base caliente (Fig. 10)
+// 3. T_W,ave = Promedio superficial en la pared convectiva del canal (Ec. 11)
+// 4. T_f,ave = Temperatura media del fluido (Ec. 11)
+// ============================================================================
+
+// Promedios en la entrada del fluido (inlet)
+inletFluid
+{
+    type            surfaceFieldValue;
+    libs            (fieldFunctionObjects);
+    region          fluid;
+    writeControl    timeStep;
+    writeInterval   10;
+    log             false;
+    writeFields     false;
+    regionType      patch;
+    name            inlet;
+    operation       areaAverage;
+    fields          (p p_rgh T.liquid alpha.gas U.liquid);
+}
+
+// Promedios en la salida del fluido (outlet)
+outletFluid
+{
+    type            surfaceFieldValue;
+    libs            (fieldFunctionObjects);
+    region          fluid;
+    writeControl    timeStep;
+    writeInterval   10;
+    log             false;
+    writeFields     false;
+    regionType      patch;
+    name            outlet;
+    operation       areaAverage;
+    fields          (p p_rgh T.liquid T.gas alpha.gas U.liquid U.gas);
+}
+
+// Temperatura promedio de la pared convectiva mojada (T_W,ave del lado fluido)
+interfaceFluid
+{
+    type            surfaceFieldValue;
+    libs            (fieldFunctionObjects);
+    region          fluid;
+    writeControl    timeStep;
+    writeInterval   10;
+    log             false;
+    writeFields     false;
+    regionType      patch;
+    name            fluid_to_solid;
+    operation       areaAverage;
+    fields          (T.liquid alpha.gas);
+}
+
+// Temperatura media volumétrica del fluido (T_f,ave)
+volFluid
+{
+    type            volFieldValue;
+    libs            (fieldFunctionObjects);
+    region          fluid;
+    writeControl    timeStep;
+    writeInterval   10;
+    log             false;
+    writeFields     false;
+    operation       volAverage;
+    fields          (T.liquid T.gas alpha.gas p);
+}
+
+// Temperatura promedio de la superficie base caliente (T_base,ave - Fig. 10)
+baseSolid
+{
+    type            surfaceFieldValue;
+    libs            (fieldFunctionObjects);
+    region          solid;
+    writeControl    timeStep;
+    writeInterval   10;
+    log             false;
+    writeFields     false;
+    regionType      patch;
+    name            outerBottom;
+    operation       areaAverage;
+    fields          (T);
+}
+
+// Temperatura promedio en la interfaz del lado sólido (solid_to_fluid)
+interfaceSolid
+{
+    type            surfaceFieldValue;
+    libs            (fieldFunctionObjects);
+    region          solid;
+    writeControl    timeStep;
+    writeInterval   10;
+    log             false;
+    writeFields     false;
+    regionType      patch;
+    name            solid_to_fluid;
+    operation       areaAverage;
+    fields          (T);
+}
+
+// Monitoreo de extremos de fase
+phaseStatistics
+{
+    type            fieldMinMax;
+    libs            (fieldFunctionObjects);
+    region          fluid;
+    writeControl    timeStep;
+    writeInterval   10;
+    log             false;
+    fields          (alpha.gas T.gas T.liquid p);
+    location        false;
+}
+
+// ************************************************************************* //

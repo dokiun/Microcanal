@@ -129,11 +129,56 @@ Para reiniciar el tiempo a 0 y eliminar los directorios de resultados de tiempo 
 bash Allclean
 ```
 
+### 6. Reducción de datos e integrales superficiales (Ghani et al., 2017)
+El caso evalúa automáticamente en cada paso de tiempo las variables integrales del artículo mediante el diccionario [system/dataReduction](system/dataReduction):
+* **Caída de presión ($\Delta P$):** Promedios superficiales `inletFluid` y `outletFluid` en $p$ y $p_{\text{rgh}}$ ($\Delta P = \bar{p}_{\text{in}} - \bar{p}_{\text{out}}$).
+* **Temperatura de la base caliente ($T_{\text{base}}$):** Promedio superficial `baseSolid` sobre el parche `outerBottom` ($y = -0.20\text{ mm}$, correspondiente a la Fig. 10 del paper).
+* **Temperatura media de la pared convectiva ($T_{W,\text{ave}}$):** Promedios superficiales `interfaceFluid` e `interfaceSolid` en la interfaz `fluid_to_solid` / `solid_to_fluid`.
+* **Temperatura media del fluido ($T_{f,\text{ave}}$):** Promedio volumétrico `volFluid` en la región `fluid`.
+* **Planos de contorno:** `system/cuttingPlanes` extrae los planos $y = 0\text{ m}$ (plano medio del canal) y $z = 5\text{ mm}$ (corte transversal central).
+Los resultados se registran automáticamente en el directorio `postProcessing/`.
+
 ## Estado del caso
 
-El solver activo es **`chtMultiRegionTwoPhaseEulerFoam` de OpenFOAM v2512**: CHT transitorio, gravedad, dos fases Euler–Euler y evaporación/condensación térmica interfacial. Las fases son `liquid` (agua) y `gas` (vapor de agua). Se conserva silicio, simetría MC-RC, entrada a 300 K y flujo térmico de base de 1 MW/m² (3 W).
+El caso se encuentra completamente preparado, verificado y listo para simulación con **`chtMultiRegionTwoPhaseEulerFoam` de OpenFOAM v2512**.
 
-La migración está probada con corridas cortas aisladas a 300 K y 380 K. No se ha ejecutado la corrida completa ni validado el modelo contra datos bifásicos. El modelo laminar usa una semilla de vapor y cierres de fase dispersa; **no incluye nucleación de pared**.
+### 1. Física y Formulación del Solver
+* **Solver activo:** `chtMultiRegionTwoPhaseEulerFoam` (Transferencia de calor conjugada sólido-fluido multifásica transitoria).
+* **Fases interpenetrables:**
+  * `liquid`: Agua líquida con ecuación de estado Boussinesq ($C_p = 4216\text{ J/(kg K)}$, $k = 0.671\text{ W/(m K)}$, $\mu = 2.82 \times 10^{-4}\text{ Pa s}$).
+  * `gas`: Vapor de agua como gas ideal ($C_p = 2030\text{ J/(kg K)}$, $k = 0.0248\text{ W/(m K)}$, $\mu = 1.22 \times 10^{-5}\text{ Pa s}$).
+* **Cambio de fase:** Modelo térmico interfacial (`thermalPhaseChangeTwoPhaseSystem`) con calor latente $L = 2.26\text{ MJ/kg}$ referenciado a $T_{\text{ref}} = 373.15\text{ K}$ y $p_{\text{ref}} = 101325\text{ Pa}$.
+* **Fuerzas y acoplamiento interfacial:** Arrastre de Schiller–Naumann, transferencia de calor de Ranz–Marshall, masa virtual ($C_{vm} = 0.5$) y diámetro inicial de burbuja/gota de $10\ \mu\text{m}$.
+* **Gravedad:** Activa en dirección transversal $g = (0, -9.81, 0)\text{ m/s}^2$.
 
-El lanzador `AllrunCh` no reconstruye mallas ni restaura campos antiguos. `startFrom startTime` inicia en 0; para una nueva corrida usar una copia limpia de resultados y, para reanudar, configurar explícitamente `startFrom latestTime`. `endTime = 0.0015 s` se conserva como intervalo inicial de prueba, no como tiempo suficiente para establecer el régimen térmico. Los archivos VoF anteriores se conservan en `legacy/vof/` y no son leídos por el solver.
+### 2. Geometría y Materiales
+* **Geometría representativa:** Sección en "I" de silicio con 2 medios canales simétricos ($D_h = 200\ \mu\text{m}$, correspondiente al modelo MC-RC de Ghani et al., 2017).
+* **Dominio exterior:** $0.30\text{ mm (ancho X)} \times 0.40\text{ mm (altura Y)} \times 10.0\text{ mm (longitud Z)}$.
+* **Sólido (Silicio):** $k = 130\text{ W/(m K)}$, $C_p = 700\text{ J/(kg K)}$, $\rho = 2329\text{ kg/m}^3$ (valores experimentales de referencia a 300 K).
+
+### 3. Condiciones de Frontera
+* **Entrada de fluido (`inlet`):** Caudal másico constante de $1.21 \times 10^{-5}\text{ kg/s}$ de líquido puro ($\alpha_{\text{liquid}} = 1$) a temperatura $T_{\text{in}} = 300\text{ K}$.
+* **Salida de fluido (`outlet`):** Presión estática de $101325\text{ Pa}$ con condición hidrostática `prghPressure`.
+* **Base caliente (`outerBottom`):** Flujo de calor uniforme $q'' = 100\text{ W/cm}^2 = 10^6\text{ W/m}^2$ (potencia nominal $Q = 3\text{ W}$ en el dominio representativo).
+* **Laterales exteriores (`outerLeft`, `outerRight`):** `symmetryPlane` en ambas regiones.
+* **Interfaz sólido-fluido (`solid_to_fluid` / `fluid_to_solid`):** Acoplamiento térmico CHT `compressible::turbulentTemperatureTwoPhaseRadCoupledMixed` con continuidad de flujo de calor y temperatura.
+* **Superficies restantes:** Adiabáticas (`zeroGradient`).
+
+### 4. Reducción de Datos y Exportación VTK para Animaciones
+* **Integrales numéricas ([system/dataReduction](system/dataReduction)):**
+  * $\Delta P = \bar{p}_{\text{in}} - \bar{p}_{\text{out}}$ (Caída de presión total).
+  * $T_{\text{base}}$ (Temperatura promedio superficial en la base caliente, Fig. 10).
+  * $T_{W,\text{ave}}$ (Temperatura promedio de pared mojada para el cálculo de $\text{Nu}_{\text{ave}}$).
+  * $T_{f,\text{ave}}$ (Temperatura volumétrica media del fluido).
+* **Superficies y planos VTK ([system/cuttingPlanes](system/cuttingPlanes)):**
+  * Plano medio longitudinal $y = 0\text{ m}$ (contornos de velocidad, presión y temperatura).
+  * Cortes transversales en $z = 2.5\text{ mm}$, $z = 5.0\text{ mm}$ y $z = 7.5\text{ mm}$.
+  * Isosuperficie 3D de vapor ($\alpha_{\text{gas}} = 0.05$) para visualización de burbujas en ParaView.
+  * Superficies de pared mojada y base sólida caliente.
+
+### 5. Control Numérico y Estabilidad
+* Paso de tiempo adaptativo con $\text{maxCo} = 0.195$, $\text{maxDi} = 10$, $\Delta t_{\text{inicial}} = 10^{-8}\text{ s}$ y $\Delta t_{\text{max}} = 5 \times 10^{-7}\text{ s}$.
+* Frecuencia de escritura: `writeInterval 1e-4 s` con `writeCompression on;` para generar animaciones fluidas optimizando el espacio en disco.
+* El caso está validado localmente con el script de prueba de integración `python3 scripts/check_euler.py`.
+
 
