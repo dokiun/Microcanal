@@ -44,14 +44,16 @@ Posteriormente, "topoSet" genera la región "fluid" como el complemento de la re
 fluid = todas las celdas del dominio - solid
 
 Finalmente, "splitMeshRegions -cellZonesOnly" utiliza las "cellZones" "solid" y "fluid" para generar las mallas independientes:
-
+```
 constant/
 ├── fluid/
 │   └── polyMesh/
 └── solid/
     └── polyMesh/
-
+```
 Esta estrategia permite cambiar fácilmente la geometría sólida sin redefinir manualmente la región fluida. Por ejemplo, el STL puede representar un perfil en T, una sección rectangular, un perfil rectangular hueco u otra geometría cerrada. En todos los casos, el material contenido por el STL se considera sólido y el volumen restante dentro del dominio de "blockMesh" se asigna al fluido.
+
+```
 
 STL
  │
@@ -72,6 +74,7 @@ snappyHexMesh
         splitMeshRegions
              /          \
           fluid         solid
+```
 
 Para que este procedimiento funcione correctamente, la geometría STL debe representar una superficie cerrada y válida, y "locationInMesh" debe encontrarse en una posición coherente con el dominio que se desea conservar.
 
