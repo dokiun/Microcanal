@@ -10,24 +10,25 @@ application chtMultiRegionTwoPhaseEulerFoam;
 startFrom startTime;
 startTime 0;
 stopAt endTime;
-endTime 0.0015;
-deltaT 1e-8;
+endTime 0.0150;
+deltaT 1e-4;
 writeControl adjustableRunTime;
 writeInterval 1e-4;
 purgeWrite 0;
 writeFormat ascii;
-writePrecision 12;
-writeCompression off;
+writePrecision 10;
+writeCompression on;
 timeFormat general;
-timePrecision 12;
+timePrecision 10;
 runTimeModifiable yes;
 adjustTimeStep yes;
 maxCo 0.195;
 maxDi 10;
-maxDeltaT 5e-7;
+maxDeltaT 1e-4;
 libs ("libthermoTools.so");
+
 functions
 {
-    #include "probes"
+    #include "dataReduction"
     #include "cuttingPlanes"
 }
