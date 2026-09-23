@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  plus                                  |
-|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
+|  \\    /   O peration     | Version:  v2406                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -10,6 +10,7 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
+    location    "system/fluid";
     object      fvSolution;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -18,23 +19,18 @@ solvers
 {
     alpha.water
     {
-        nAlphaCorr      4;
-        nAlphaSubCycles 4;
-        cAlpha          2;
-
-        MULESCorr       yes;
-        nLimiterIter    5;
-
+        advectionScheme isoAdvection;
+        reconstructionScheme isoAlpha;
+        
         solver          smoothSolver;
         smoother        symGaussSeidel;
         tolerance       1e-8;
         relTol          0;
-        advectionScheme isoAdvection;
-        reconstructionScheme isoAlpha;
-        vof2IsoTol 1e-8;
-        surfCellTol 1e-6;
-        snapTol     1e-10;
-        writeVTK true;
+        
+        vof2IsoTol      1e-8;
+        surfCellTol     1e-6;
+        snapTol         1e-10;
+        writeVTK        false;
     }
 
     psiFinal
@@ -82,28 +78,24 @@ solvers
         tolerance        1e-6;
         relTol           1e-4;
         smoother         DIC;
-        minIter		 3;
-       // maxIter	 15;
+        minIter          1;
     }
 
     p_rghFinal
     {
         $p_rgh;
         tolerance        1e-7;
-        relTol		 0;
-        minIter 3;
-        //maxIter 20;
+        relTol           0;
+        minIter          1;
     }
 
     "(U|h|T.*|k|epsilon|R)"
     {
-        solver           smoothSolver; //PBiCGStab;
+        solver           smoothSolver;
         smoother         symGaussSeidel;
-        //preconditioner   DILU;
-        tolerance         1e-7;
-        relTol            1e-5;
-        minIter          10;
-        //maxIter          100;
+        tolerance        1e-7;
+        relTol           1e-5;
+        minIter          1;      // Optimizado: evita 10 iteraciones innecesarias cuando ya convergió
     }
 
     "(U|h|T.*|k|epsilon|R)Final"
@@ -111,7 +103,7 @@ solvers
         $U;
         tolerance        5e-8;
         relTol           0;
-        //maxIter          100;
+        minIter          1;
     }
 }
 
@@ -121,8 +113,8 @@ PIMPLE
     nCorrectors         5;
     nOuterCorrectors    4;
     nNonOrthogonalCorrectors 2;
-    pMinFactor      0.5;
-    pMaxFactor      1.8;
+    pMinFactor          0.5;
+    pMaxFactor          1.8;
 
     residualControl
     {
@@ -143,10 +135,10 @@ relaxationFactors
     equations
     {
         "h.*"           0.80;
-	T		0.70;
+        T               0.70;
         "U.*"           0.87;
         U               0.87;
-	"(alpha.*)"	0.5;
+        "(alpha.*)"     0.5;
         "(k|epsilon)"   0.70;
     }
 }

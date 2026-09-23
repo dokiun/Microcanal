@@ -63,4 +63,4 @@ meshQualityControls
     nSmoothScale 4;
     errorReduction 0.75;
 }
-mergeTolerance 1e-8;
+mergeTolerance 1e-8; 

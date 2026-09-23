@@ -23,7 +23,7 @@ endTime         0.0015; //0.042; //1.0;
 deltaT          1.00e-8;
 writeControl    adjustableRunTime;
 writeInterval   1.0e-4;
-purgeWrite      11;
+purgeWrite      0;
 writeFormat     binary;
 writePrecision  8;
 writeCompression off;

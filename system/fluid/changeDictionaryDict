@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v1806                                 |
-|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
+|  \\    /   O peration     | Version:  v2406                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -10,6 +10,7 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
+    location    "system/fluid";
     object      changeDictionaryDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -18,39 +19,16 @@ dictionaryReplacement
 {
     boundary
     {
-        fluidToSolidTop
+        fluid_to_solid
         {
             type            mappedWall;
             inGroups        1 ( wall );
             sampleMode      nearestPatchFace;
             sampleRegion    solid;
-            samplePatch     solidToFluidTop;
-        }
-        fluidToSolidBottom
-        {
-            type            mappedWall;
-            inGroups        1 ( wall );
-            sampleMode      nearestPatchFace;
-            sampleRegion    solid;
-            samplePatch     solidToFluidBottom;
-        }
-        fluidToSolidLeft
-        {
-            type            mappedWall;
-            inGroups        1 ( wall );
-            sampleMode      nearestPatchFace;
-            sampleRegion    solid;
-            samplePatch     solidToFluidLeft;
-        }
-        fluidToSolidRight
-        {
-            type            mappedWall;
-            inGroups        1 ( wall );
-            sampleMode      nearestPatchFace;
-            sampleRegion    solid;
-            samplePatch     solidToFluidRight;
+            samplePatch     solid_to_fluid;
         }
     }
 }
+
 
 // ************************************************************************* //

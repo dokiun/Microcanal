@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  plus                                  |
-|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
+|  \\    /   O peration     | Version:  2406                                  |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -10,8 +10,8 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
-    location    "constant";
-    object      thermophysicalProperties;
+    location    "constant/fluid";
+    object      thermophysicalProperties.air;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -19,8 +19,8 @@ thermoType
 {
     type            heRhoThermo;
     mixture         pureMixture;
-    transport       const;  // tabulated
-    thermo          hConst; // hTabulated
+    transport       const;
+    thermo          hConst;
     equationOfState perfectGas;
     specie          specie;
     energy          sensibleInternalEnergy;
@@ -30,23 +30,21 @@ mixture
 {
     specie
     {
-        molWeight   18.0;
+        molWeight   18.015;
     }
     thermodynamics
     {
         Cp          2030;
-        Hf          0;
+        Hf          2257000;    // Calor latente de vaporización del agua (J/kg) antes estaba en 0
         Sf          0;
     }
     transport
     {
-        mu          1e-5;
-        Pr          1;
+        mu          1.22e-5;
+        Pr          1.0;
     }
 }
 
-
 dpdt off;
-
 
 // ************************************************************************* //

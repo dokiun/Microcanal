@@ -27,26 +27,9 @@ thermoType
 
 mixture
 {
-    specie
-    {
-        molWeight   63.546;
-    }
-
-    transport
-    {
-        kappa   401;
-    }
-
-    thermodynamics
-    {
-        Hf      0;
-        Cp      385;
-    }
-
-    equationOfState
-    {
-        rho     8960;
-    }
+    specie { molWeight 63.546; }     // Masa molar del Cobre
+    transport { kappa 401; }          // Conductividad del Cobre (401 W/m K)
+    thermodynamics { Hf 0; Cp 385; }  // Calor específico del Cobre (385 J/kg K)
+    equationOfState { rho 8960; }     // Densidad del Cobre (8960 kg/m3)
 }
-
 // ************************************************************************* //

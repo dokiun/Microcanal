@@ -71,3 +71,4 @@ condiciones térmicas y los scripts antiguos de preparación corresponden
 al caso anterior; deben adaptarse a los nuevos patches antes de simular.
 Usar `AllmeshSTL` para este mallado, no `AllrunCh` ni los scripts antiguos
 `runAllPrepare*`, que dependen de los diccionarios archivados.
+ 

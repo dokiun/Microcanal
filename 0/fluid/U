@@ -8,8 +8,7 @@
 FoamFile
 {
     version     2.0;
-    format      binary;
-    arch        "LSB;label=32;scalar=64";
+    format      ascii;
     class       volVectorField;
     location    "0/fluid";
     object      U;
@@ -18,7 +17,7 @@ FoamFile
 
 dimensions      [0 1 -1 0 0 0 0];
 
-internalField   uniform (0 0 0.61);
+internalField   uniform (0 0 0.27);
 
 boundaryField
 {
@@ -27,30 +26,29 @@ boundaryField
         type            flowRateInletVelocity;
         massFlowRate    constant 1.21e-05;
         extrapolateProfile yes;
-        value           uniform (0 0 1.21e-05);
+        value           uniform (0 0 0.27);
     }
+
     outlet
     {
         type            pressureInletOutletVelocity;
         value           uniform (0 0 0);
     }
-    fluidToSolidBottom
+
+    outerRight
     {
         type            noSlip;
     }
-    fluidToSolidLeft
+
+    outerLeft
     {
         type            noSlip;
     }
-    fluidToSolidTop
-    {
-        type            noSlip;
-    }
-    fluidToSolidRight
+
+    fluid_to_solid
     {
         type            noSlip;
     }
 }
-
 
 // ************************************************************************* //

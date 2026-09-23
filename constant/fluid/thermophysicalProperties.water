@@ -12,7 +12,7 @@ FoamFile
     class       dictionary;
     location    "constant";
     object      thermophysicalProperties;
-}
+} 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 thermoType

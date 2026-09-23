@@ -18,22 +18,22 @@ FoamFile
 
 dimensions      [0 0 0 1 0 0 0];
 
-internalField   uniform 372.15;
+internalField   uniform 300; //estaba en 372.15... como muy alto
 
 boundaryField
 {
     inlet
     {
-        type            totalTemperature;
-        gamma           1.4;
-        T0              uniform 372.15;
-        value           uniform 372.15;
+        type            fixedValue; //totalTemperature
+        //gamma           1.4;
+        //T0              uniform 300;
+        value           uniform 300;
     }
     outlet
     {
         type            zeroGradient;
     }
-    fluidToSolidBottom
+    fluid_to_solid
     {
         type            compressible::turbulentTemperatureRadCoupledMixed;
         Tnbr            T;
@@ -41,37 +41,7 @@ boundaryField
         qrNbr           none;
         qr              none;
         kappa           none;
-        value           uniform 372.15;
-    }
-    fluidToSolidLeft
-    {
-        type            compressible::turbulentTemperatureRadCoupledMixed;
-        Tnbr            T;
-        kappaMethod     fluidThermo;
-        qrNbr           none;
-        qr              none;
-        kappa           none;
-        value           uniform 372.15;
-    }
-    fluidToSolidTop
-    {
-        type            compressible::turbulentTemperatureRadCoupledMixed;
-        Tnbr            T;
-        kappaMethod     fluidThermo;
-        qrNbr           none;
-        qr              none;
-        kappa           none;
-        value           uniform 372.15;
-    }
-    fluidToSolidRight
-    {
-        type            compressible::turbulentTemperatureRadCoupledMixed;
-        Tnbr            T;
-        kappaMethod     fluidThermo;
-        qrNbr           none;
-        qr              none;
-        kappa           none;
-        value           uniform 372.15;
+        value           uniform 300;
     }
 }
 
