@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2512                                  |
+|  \\    /   O peration     | Version:  2406                                  |
 |   \\  /    A nd           | Website:  www.openfoam.com                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -12,24 +12,16 @@ FoamFile
     arch        "LSB;label=32;scalar=64";
     class       volScalarField;
     location    "0/fluid";
-    object      cellToRegion;
+    object      T;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 0 0 0 0 0 0];
+dimensions      [0 0 0 1 0 0 0];
 
-internalField   uniform 1;
+internalField   uniform 300; //estaba en 372.15... como muy alto
 
 boundaryField
 {
-    inlet
-    {
-        type            zeroGradient;
-    }
-    outlet
-    {
-        type            zeroGradient;
-    }
     outerRight
     {
         type            symmetryPlane;
@@ -38,10 +30,26 @@ boundaryField
     {
         type            symmetryPlane;
     }
+    inlet
+    {
+        type            fixedValue; //totalTemperature
+        //gamma           1.4;
+        //T0              uniform 300;
+        value           uniform 300;
+    }
+    outlet
+    {
+        type            zeroGradient;
+    }
     fluid_to_solid
     {
-        type            calculated;
-        value           uniform 0;
+        type            compressible::turbulentTemperatureRadCoupledMixed;
+        Tnbr            T;
+        kappaMethod     fluidThermo;
+        qrNbr           none;
+        qr              none;
+        kappa           none;
+        value           uniform 300;
     }
 }
 

@@ -40,7 +40,7 @@ boundaryField
     }
     outerRight
     {
-        type            zeroGradient;
+        type            symmetryPlane;
     }
     outerTop
     {
@@ -48,12 +48,14 @@ boundaryField
     }
     outerLeft
     {
-        type            zeroGradient;
+        type            symmetryPlane;
     }
     solid_to_fluid
     {
-        type            compressible::turbulentTemperatureRadCoupledMixed;
-        Tnbr            T;
+        type            compressible::turbulentTemperatureTwoPhaseRadCoupledMixed;
+        Tnbr            T.liquid;
+        region          solid;
+        otherPhase      gas;
         kappaMethod     solidThermo;
         qrNbr           none;
         qr              none;

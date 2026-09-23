@@ -17,7 +17,7 @@ FoamFile
 
 ddtSchemes
 {
-    default         backward; // Si requieres mayor estabilidad temporal inicial, usar Euler
+    default         Euler; // Si requieres mayor estabilidad temporal inicial, usar Euler
 }
 
 gradSchemes

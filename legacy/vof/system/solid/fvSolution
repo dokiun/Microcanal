@@ -10,35 +10,27 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
-    location    "system/fluid";
-    object      changeDictionaryDict;
+    location    "system/solid";
+    object      fvSolution;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dictionaryReplacement
+solvers
 {
-    boundary
+    "(h|T|e)"
     {
-        outerLeft
-        {
-            type symmetryPlane;
-            inGroups 1 (symmetryPlane);
-        }
-        outerRight
-        {
-            type symmetryPlane;
-            inGroups 1 (symmetryPlane);
-        }
-        fluid_to_solid
-        {
-            type            mappedWall;
-            inGroups        1 ( wall );
-            sampleMode      nearestPatchFace;
-            sampleRegion    solid;
-            samplePatch     solid_to_fluid;
-        }
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-8;
+        relTol          0;
+    }
+
+    "(h|T|e)Final"
+    {
+        $h;
+        tolerance       1e-8;
+        relTol          0;
     }
 }
-
 
 // ************************************************************************* //

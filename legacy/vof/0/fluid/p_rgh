@@ -8,49 +8,49 @@
 FoamFile
 {
     version     2.0;
-    format      binary;
-    arch        "LSB;label=32;scalar=64";
+    format      ascii;
     class       volScalarField;
     location    "0/fluid";
-    object      alpha.water;
+    object      p_rgh;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 0 0 0 0 0 0];
+dimensions      [1 -1 -2 0 0 0 0];
 
-//internalField   nonuniform List<scalar> 
-//990000 son como una malla que ya se habia hecho
-
-internalField uniform 1; //que ese valor de alpha será 1 en todo lugar (agua)
+internalField   uniform 101325;
 
 boundaryField
 {
     inlet
     {
-        type            fixedValue;
-        value           uniform 1;
+        type            zeroGradient;
     }
 
     outlet
     {
-        type            inletOutlet;
-        inletValue      uniform 1;
-        value           uniform 1;
+        type            totalPressure;
+        rho             rho;
+        psi             none;
+        gamma           1;
+        p0              uniform 101325;
+        value           uniform 101325;
     }
 
     outerRight
     {
-        type            zeroGradient;
+        type            symmetryPlane;
     }
 
     outerLeft
     {
-        type            zeroGradient;
+        type            symmetryPlane;
     }
 
     fluid_to_solid
     {
-        type            zeroGradient;
+        type            fixedFluxPressure;
+        gradient        uniform 0;
+        value           uniform 101325;
     }
 }
 

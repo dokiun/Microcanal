@@ -37,12 +37,12 @@ boundaryField
 
     outerRight
     {
-        type            noSlip;
+        type            symmetryPlane;
     }
 
     outerLeft
     {
-        type            noSlip;
+        type            symmetryPlane;
     }
 
     fluid_to_solid

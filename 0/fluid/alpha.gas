@@ -3,11 +3,11 @@ FoamFile
     version 2.0;
     format ascii;
     class volScalarField;
-    object p_rgh;
+    object alpha.gas;
 }
 
-dimensions [1 -1 -2 0 0 0 0];
-internalField uniform 101325;
+dimensions [0 0 0 0 0 0 0];
+internalField uniform 1e-6;
 boundaryField
 {
     outerLeft
@@ -20,14 +20,14 @@ boundaryField
     }
     inlet
     {
-        type fixedFluxPressure; value uniform 101325;
+        type fixedValue; value uniform 0;
     }
     outlet
     {
-        type prghPressure; rho rho; p uniform 101325; value uniform 101325;
+        type inletOutlet; phi phi.gas; inletValue uniform 0; value uniform 0;
     }
     fluid_to_solid
     {
-        type fixedFluxPressure; value uniform 101325;
+        type zeroGradient;
     }
 }

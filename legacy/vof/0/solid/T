@@ -10,47 +10,55 @@ FoamFile
     version     2.0;
     format      ascii;
     class       volScalarField;
-    location    "0/fluid";
-    object      T.air;
+    location    "0/solid";
+    object      T;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 dimensions      [0 0 0 1 0 0 0];
 
-internalField   uniform 372.15;
+internalField   uniform 300;
 
 boundaryField
 {
     inlet
     {
-        type            fixedValue;
-        value           uniform 372.15;
+        type            zeroGradient;
     }
-
     outlet
     {
         type            zeroGradient;
     }
-
+    outerBottom
+    {
+        type            externalWallHeatFluxTemperature;
+        mode            flux;
+        q               uniform 1000000;    // 100 W/cm2 = 1,000,000 W/m2
+        kappaMethod     solidThermo;
+        kappa           none;
+        value           uniform 300;
+    }
     outerRight
     {
-        type            zeroGradient;
+        type            symmetryPlane;
     }
-
-    outerLeft
+    outerTop
     {
         type            zeroGradient;
     }
-
-    fluid_to_solid
+    outerLeft
+    {
+        type            symmetryPlane;
+    }
+    solid_to_fluid
     {
         type            compressible::turbulentTemperatureRadCoupledMixed;
         Tnbr            T;
-        kappaMethod     fluidThermo;
+        kappaMethod     solidThermo;
         qrNbr           none;
         qr              none;
         kappa           none;
-        value           uniform 372.15;
+        value           uniform 300;
     }
 }
 

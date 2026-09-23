@@ -9,7 +9,9 @@ El dominio exterior es un rectángulo de 0.30 × 0.40 mm:
 - x: -0.15 a 0.15 mm; y: -0.20 a 0.20 mm.
 - Alma sólida: x entre -0.075 y 0.075 mm.
 - Alas superior e inferior: 0.05 mm de espesor.
-- Dos canales laterales: 0.075 × 0.30 mm, longitud 10 mm.
+- Dos medios canales laterales: 0.075 × 0.30 mm, longitud 10 mm.
+- Referencia MC-RC: planos de simetría en x = ±0.15 mm (`outerLeft`, `outerRight`), tanto en sólido como en fluido. El canal completo mide 0.15 × 0.30 mm y su Dh es 200 µm.
+- `blockMeshDict` genera esos patches como `symmetryPlane`; el mallado y la separación de regiones conservan su tipo.
 - Volumen sólido esperado: 0.75 mm³; fluido total: 0.45 mm³.
 
 ## Generación
@@ -66,9 +68,10 @@ y **Point Arrays**, ya que los campos de `0/` aún corresponden al caso anterior
 
 ## Alcance
 
-Este procedimiento prepara geometría y mallas. Los campos en `0/`, las
-condiciones térmicas y los scripts antiguos de preparación corresponden
-al caso anterior; deben adaptarse a los nuevos patches antes de simular.
+Este procedimiento prepara geometría y mallas. Los campos en `0/`, parte de las
+condiciones físicas y los scripts antiguos de preparación corresponden
+al caso anterior. Las condiciones laterales de todos los campos ya usan
+`symmetryPlane`; el caso físico se migró a `chtMultiRegionTwoPhaseEulerFoam`, transitorio con cambio de fase, según el README principal.
 Usar `AllmeshSTL` para este mallado, no `AllrunCh` ni los scripts antiguos
 `runAllPrepare*`, que dependen de los diccionarios archivados.
  

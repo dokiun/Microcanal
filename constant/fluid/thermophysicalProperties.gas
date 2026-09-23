@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2406                                 |
+|  \\    /   O peration     | Version:  2406                                  |
 |   \\  /    A nd           | Website:  www.openfoam.com                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -10,34 +10,43 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
-    location    "system/solid";
-    object      changeDictionaryDict;
+    location    "constant/fluid";
+    object thermophysicalProperties.gas;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dictionaryReplacement
+thermoType
 {
-    boundary
+    type            heRhoThermo;
+    mixture         pureMixture;
+    transport       const;
+    thermo          hConst;
+    equationOfState perfectGas;
+    specie          specie;
+    energy          sensibleEnthalpy;
+}
+
+mixture
+{
+    specie
     {
-        outerLeft
-        {
-            type symmetryPlane;
-            inGroups 1 (symmetryPlane);
-        }
-        outerRight
-        {
-            type symmetryPlane;
-            inGroups 1 (symmetryPlane);
-        }
-        solid_to_fluid
-        {
-            type            mappedWall;
-            inGroups        1 ( wall );
-            sampleMode      nearestPatchFace;
-            sampleRegion    fluid;
-            samplePatch     fluid_to_solid;
-        }
+        molWeight   18.015;
+    }
+    thermodynamics
+    {
+        Cp          2030;
+        Hf 0;
+        Tref 373.15;
+        Href 2260000;
+        Sf          0;
+    }
+    transport
+    {
+        mu          1.22e-5;
+        Pr          1.0;
     }
 }
+
+dpdt off;
 
 // ************************************************************************* //

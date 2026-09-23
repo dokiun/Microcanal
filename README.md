@@ -3,7 +3,10 @@
 Mallado multirregión desde `geometry/Microcanal.stl`, en milímetros. El STL representa un sólido con sección en I; el fluido ocupa los dos canales laterales.
 
 - Dimensiones exteriores: **0.30 × 0.40 × 10 mm**.
-- Cada canal: **0.075 × 0.30 × 10 mm**.
+- Referencia inicial: **MC-RC**, canal rectangular del paper.
+- Cada franja fluida representa medio canal: **0.075 × 0.30 × 10 mm**.
+- `outerLeft` y `outerRight` son planos `symmetryPlane` en x = ±0.15 mm, en ambas regiones.
+- Canal físico completo: **0.15 × 0.30 mm**; diámetro hidráulico **Dh = 200 µm**. Las caras de simetría no cuentan como paredes mojadas.
 - Regiones: `solid` y `fluid` (ambos canales).
 
 ## Generar la malla
@@ -80,4 +83,15 @@ Para que este procedimiento funcione correctamente, la geometría STL debe repre
 
 ## Estado del caso
 
-La geometría y la malla están listas para visualizar. La configuración de `chtMultiRegionFoam` está pendiente: los campos de `0/`, las propiedades físicas y las condiciones de contorno todavía corresponden al caso anterior. No se ha ejecutado una simulación con la nueva geometría.
+El solver activo es **`chtMultiRegionTwoPhaseEulerFoam` de OpenFOAM v2512**: CHT transitorio, gravedad, dos fases Euler–Euler y evaporación/condensación térmica interfacial. Las fases son `liquid` (agua) y `gas` (vapor de agua). Se conserva silicio, simetría MC-RC, entrada a 300 K y flujo térmico de base de 1 MW/m² (3 W).
+
+La migración está probada con corridas cortas aisladas a 300 K y 380 K. No se ha ejecutado la corrida completa ni validado el modelo contra datos bifásicos. El modelo laminar usa una semilla de vapor y cierres de fase dispersa; **no incluye nucleación de pared**. Los supuestos y pruebas están en [COMPATIBILIDAD_SOLVER.md](COMPATIBILIDAD_SOLVER.md).
+
+```bash
+source /usr/lib/openfoam/openfoam2512/etc/bashrc
+bash AllrunCh                 # serial, mallas existentes
+# bash AllrunCh parallel      # 4 procesos, requiere MPI y no tener processor* previos
+python3 scripts/check_euler.py # dos pruebas de un paso en copias temporales
+```
+
+El lanzador no reconstruye mallas ni restaura campos antiguos. `startFrom startTime` inicia en 0; para una nueva corrida usar una copia limpia de resultados y, para reanudar, configurar explícitamente `startFrom latestTime`. `endTime = 0.0015 s` se conserva como intervalo inicial de prueba, no como tiempo suficiente para establecer el régimen térmico. Los archivos VoF anteriores se conservan en `legacy/vof/` y no son leídos por el solver.

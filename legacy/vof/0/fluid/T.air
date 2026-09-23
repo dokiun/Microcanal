@@ -11,20 +11,20 @@ FoamFile
     format      ascii;
     class       volScalarField;
     location    "0/fluid";
-    object      T.water;
+    object      T.air;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 dimensions      [0 0 0 1 0 0 0];
 
-internalField   uniform 300;
+internalField   uniform 372.15;
 
 boundaryField
 {
     inlet
     {
         type            fixedValue;
-        value           uniform 300;
+        value           uniform 372.15;
     }
 
     outlet
@@ -34,12 +34,12 @@ boundaryField
 
     outerRight
     {
-        type            zeroGradient;
+        type            symmetryPlane;
     }
 
     outerLeft
     {
-        type            zeroGradient;
+        type            symmetryPlane;
     }
 
     fluid_to_solid
@@ -50,7 +50,7 @@ boundaryField
         qrNbr           none;
         qr              none;
         kappa           none;
-        value           uniform 300;
+        value           uniform 372.15;
     }
 }
 

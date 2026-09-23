@@ -32,15 +32,15 @@ FoamFile
     }
     outerRight
     {
-        type            wall;
-        inGroups        1(wall);
+        type            symmetryPlane;
+        inGroups        1(symmetryPlane);
         nFaces          2400;
         startFace       96968;
     }
     outerLeft
     {
-        type            wall;
-        inGroups        1(wall);
+        type            symmetryPlane;
+        inGroups        1(symmetryPlane);
         nFaces          2400;
         startFace       99368;
     }

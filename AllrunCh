@@ -1,34 +1,29 @@
-#!/bin/sh
-cd ${0%/*} || exit 1    # Run from this directory
-
-# Source tutorial run functions
-. $WM_PROJECT_DIR/bin/tools/RunFunctions
-
-restore0Dir
-
-cp system/fluid/blockMeshDict system/blockMeshDict
-runApplication -s fluid blockMesh &&
-mv constant/polyMesh constant/fluid/
-
-cp system/solid/blockMeshDict system/blockMeshDict
-runApplication -s solid blockMesh &&
-mv constant/polyMesh constant/solid/
-
-touch channel.foam
-
-runApplication -s solid changeDictionary -region solid -subDict dictionaryReplacement
-runApplication -s fluid changeDictionary -region fluid -subDict dictionaryReplacement
-
-#runApplication initAlphaField -region fluid
-runApplication -s fluid setFields -region fluid
-#runApplication -s solid setFields -region solid
-
-runApplication -s solid renumberMesh -region solid -overwrite
-runApplication -s fluid renumberMesh -region fluid -overwrite
-
-runApplication  decomposePar -allRegions
-
-mpirun -oversubscribe -np 10 $(getApplication) -parallel  > log.$(getApplication) 2>&1&
-
-
-#------------------------------------------------------------------------------
+#!/bin/bash
+# Run the existing MC-RC meshes; never rebuild meshes or restore old VoF fields.
+set -euo pipefail
+cd "$(dirname "$0")"
+if ! command -v chtMultiRegionTwoPhaseEulerFoam >/dev/null; then
+    echo 'Load OpenFOAM v2512 first: source /usr/lib/openfoam/openfoam2512/etc/bashrc' >&2
+    exit 1
+fi
+mode="${1:-serial}"
+if [[ "$mode" != serial && "$mode" != parallel ]]; then
+    echo 'Usage: bash AllrunCh [serial|parallel]' >&2
+    exit 2
+fi
+mkdir -p logs
+for region in fluid solid; do
+    checkMesh -constant -region "$region" > "logs/log.checkMesh.$region" 2>&1
+    grep -q 'Mesh OK' "logs/log.checkMesh.$region"
+done
+if [[ "$mode" == parallel ]]; then
+    nproc_case=$(foamDictionary system/decomposeParDict -entry numberOfSubdomains -value)
+    for region in fluid solid; do
+        nproc_region=$(foamDictionary "system/$region/decomposeParDict" -entry numberOfSubdomains -value)
+        [[ "$nproc_region" == "$nproc_case" ]] || { echo 'Inconsistent decomposition counts' >&2; exit 1; }
+    done
+    decomposePar -allRegions > logs/log.decomposePar 2>&1
+    mpirun -np "$nproc_case" chtMultiRegionTwoPhaseEulerFoam -parallel 2>&1 | tee logs/log.chtMultiRegionTwoPhaseEulerFoam
+else
+    chtMultiRegionTwoPhaseEulerFoam 2>&1 | tee logs/log.chtMultiRegionTwoPhaseEulerFoam
+fi

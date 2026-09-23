@@ -35,7 +35,7 @@ boundaryField
     }
     outerRight
     {
-        type            zeroGradient;
+        type            symmetryPlane;
     }
     outerTop
     {
@@ -43,7 +43,7 @@ boundaryField
     }
     outerLeft
     {
-        type            zeroGradient;
+        type            symmetryPlane;
     }
     solid_to_fluid
     {
