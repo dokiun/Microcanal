@@ -81,17 +81,59 @@ snappyHexMesh
 
 Para que este procedimiento funcione correctamente, la geometría STL debe representar una superficie cerrada y válida, y "locationInMesh" debe encontrarse en una posición coherente con el dominio que se desea conservar.
 
+## Guía de ejecución paso a paso
+
+Para correr la simulación desde cero en OpenFOAM v2512, siga este flujo de trabajo:
+
+### 1. Cargar el entorno de OpenFOAM
+Antes de ejecutar cualquier script o comando de OpenFOAM, inicialice las variables de entorno:
+```bash
+source /usr/lib/openfoam/openfoam2512/etc/bashrc
+```
+
+### 2. Generación de la Malla (`AllmeshSTL`)
+El script `AllmeshSTL` se encarga del proceso completo de mallado partiendo de la geometría STL (`geometry/Microcanal.stl`):
+* Escala la geometría de milímetros a metros (`constant/triSurface/Microcanal_m.stl`).
+* Crea la malla base con `blockMesh` y ajusta la superficie sólida con `snappyHexMesh`.
+* Separa las regiones con `topoSet` y `splitMeshRegions -cellZonesOnly` creando las carpetas multirregión `constant/fluid/polyMesh` y `constant/solid/polyMesh`.
+* Genera las capas límite prismáticas en el fluido y aplica el refinamiento local.
+* Verifica las mallas regionales mediante `checkMesh`.
+
+Para ejecutar el mallado:
+```bash
+bash AllmeshSTL
+```
+
+### 3. Ejecución de la Simulación (`AllrunCh`)
+`AllrunCh` es el script de lanzamiento (*starter*) del solver **`chtMultiRegionTwoPhaseEulerFoam`**. Verifica la validez de las mallas y ejecuta el cálculo.
+
+* **Ejecución en serie:**
+  ```bash
+  bash AllrunCh
+  ```
+* **Ejecución en paralelo (4 núcleos):**
+  ```bash
+  bash AllrunCh parallel
+  ```
+  *(Nota: La simulación en paralelo utiliza las configuraciones de `system/decomposeParDict` y los `decomposeParDict` regionales).*
+
+### 4. Pruebas de integración y verificación rápida
+Para verificar el funcionamiento de las fuentes de cambio de fase y el solver en la máquina local sin modificar la corrida principal:
+```bash
+python3 scripts/check_euler.py
+```
+
+### 5. Limpieza del caso (`Allclean`)
+Para reiniciar el tiempo a 0 y eliminar los directorios de resultados de tiempo y datos de posprocesamiento (conservando las mallas y los archivos de condiciones iniciales en `0/`):
+```bash
+bash Allclean
+```
+
 ## Estado del caso
 
 El solver activo es **`chtMultiRegionTwoPhaseEulerFoam` de OpenFOAM v2512**: CHT transitorio, gravedad, dos fases Euler–Euler y evaporación/condensación térmica interfacial. Las fases son `liquid` (agua) y `gas` (vapor de agua). Se conserva silicio, simetría MC-RC, entrada a 300 K y flujo térmico de base de 1 MW/m² (3 W).
 
-La migración está probada con corridas cortas aisladas a 300 K y 380 K. No se ha ejecutado la corrida completa ni validado el modelo contra datos bifásicos. El modelo laminar usa una semilla de vapor y cierres de fase dispersa; **no incluye nucleación de pared**. Los supuestos y pruebas están en [COMPATIBILIDAD_SOLVER.md](COMPATIBILIDAD_SOLVER.md).
+La migración está probada con corridas cortas aisladas a 300 K y 380 K. No se ha ejecutado la corrida completa ni validado el modelo contra datos bifásicos. El modelo laminar usa una semilla de vapor y cierres de fase dispersa; **no incluye nucleación de pared**.
 
-```bash
-source /usr/lib/openfoam/openfoam2512/etc/bashrc
-bash AllrunCh                 # serial, mallas existentes
-# bash AllrunCh parallel      # 4 procesos, requiere MPI y no tener processor* previos
-python3 scripts/check_euler.py # dos pruebas de un paso en copias temporales
-```
+El lanzador `AllrunCh` no reconstruye mallas ni restaura campos antiguos. `startFrom startTime` inicia en 0; para una nueva corrida usar una copia limpia de resultados y, para reanudar, configurar explícitamente `startFrom latestTime`. `endTime = 0.0015 s` se conserva como intervalo inicial de prueba, no como tiempo suficiente para establecer el régimen térmico. Los archivos VoF anteriores se conservan en `legacy/vof/` y no son leídos por el solver.
 
-El lanzador no reconstruye mallas ni restaura campos antiguos. `startFrom startTime` inicia en 0; para una nueva corrida usar una copia limpia de resultados y, para reanudar, configurar explícitamente `startFrom latestTime`. `endTime = 0.0015 s` se conserva como intervalo inicial de prueba, no como tiempo suficiente para establecer el régimen térmico. Los archivos VoF anteriores se conservan en `legacy/vof/` y no son leídos por el solver.
