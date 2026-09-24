@@ -34,6 +34,7 @@ CP_FLUID = 4216.0  # Calor específico del fluido (J/(kg K))
 MDOT = 1.21e-5     # Caudal másico total en inlet (kg/s)
 A_INLET = 4.5e-8   # Área de entrada total (4.5e-8 m²)
 U_MEAN = MDOT / (RHO_FLUID * A_INLET) # ~0.2805 m/s
+RE_DH = RHO_FLUID * U_MEAN * DH / 2.8176e-4  # Re_Dh con mu del thermophysicalProperties.liquid
 
 def load_dat_file(file_path):
     """Lee un archivo .dat de OpenFOAM y extrae encabezados y datos numéricos."""
@@ -152,6 +153,7 @@ def main():
     print(f"• Coeficiente Convectivo (h) : {h_ave[last_idx]:.2f} W/(m² K)")
     print(f"• Número de Nusselt (Nu_ave) : {nu_ave[last_idx]:.3f}")
     print(f"• Fracción media de vapor    : {alpha_gas[last_idx]:.4e}")
+    print(f"• Número de Reynolds (Re_Dh) : {RE_DH:.2f} (laminar)")
 
     # =========================================================================
     # GENERACIÓN DE GRÁFICAS (ESTILO PAPER ACADÉMICO / ELSEVIER)
@@ -175,7 +177,7 @@ def main():
     color_p = '#059669'
     ax2.plot(times * 1e3, delta_p_kpa, color=color_p, lw=2, label=r'$\Delta P$ [kPa]')
     ax2.set_xlabel('Tiempo $t$ [ms]', fontsize=11, fontweight='bold')
-    ax2.set_ylabel('Caída de Presión $\Delta P$ [kPa]', color=color_p, fontsize=11, fontweight='bold')
+    ax2.set_ylabel(r'Caída de Presión $\Delta P$ [kPa]', color=color_p, fontsize=11, fontweight='bold')
     ax2.tick_params(axis='y', labelcolor=color_p)
     ax2.grid(True, linestyle='--', alpha=0.6)
 
@@ -183,7 +185,7 @@ def main():
     ax2_twin = ax2.twinx()
     color_f = '#7c3aed'
     ax2_twin.plot(times * 1e3, f_app, color=color_f, lw=1.8, ls='--', label=r'$f_{\mathrm{app}}$')
-    ax2_twin.set_ylabel('Factor de Fricción Aparente $f_{\mathrm{app}}$', color=color_f, fontsize=11, fontweight='bold')
+    ax2_twin.set_ylabel(r'Factor de Fricción Aparente $f_{\mathrm{app}}$', color=color_f, fontsize=11, fontweight='bold')
     ax2_twin.tick_params(axis='y', labelcolor=color_f)
     ax2.set_title('(b) Comportamiento Hidráulico (Ecs. 10 y 18)', fontsize=12, fontweight='bold')
 
@@ -207,12 +209,12 @@ def main():
     ax4 = axs[1, 1]
     ax4.plot(times * 1e3, alpha_gas * 100, color='#9333ea', lw=2, label=r'$\alpha_{\mathrm{gas}}$ volumétrico')
     ax4.set_xlabel('Tiempo $t$ [ms]', fontsize=11, fontweight='bold')
-    ax4.set_ylabel('Fracción de Vapor $\alpha_{\mathrm{gas}}$ [%]', fontsize=11, fontweight='bold')
+    ax4.set_ylabel(r'Fracción de Vapor $\alpha_{\mathrm{gas}}$ [%]', fontsize=11, fontweight='bold')
     ax4.set_title('(d) Fracción de Fase Gaseosa (Cambio de Fase)', fontsize=12, fontweight='bold')
     ax4.grid(True, linestyle='--', alpha=0.6)
     ax4.legend(loc='best', frameon=True, fontsize=10)
 
-    fig.suptitle('Resultados CFD — Refrigeración en Microcanal MC-RC (Ghani et al., 2017)', fontsize=14, fontweight='bold', y=0.99)
+    fig.suptitle(f'Resultados CFD — Microcanal MC-RC (Ghani et al., 2017) — Re_Dh = {RE_DH:.1f}', fontsize=14, fontweight='bold', y=0.99)
     plt.tight_layout()
 
     out_png = PLOTS_DIR / "resultados_ghani_mcrc.png"

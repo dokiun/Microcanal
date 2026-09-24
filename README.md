@@ -158,6 +158,8 @@ El caso se encuentra completamente preparado, verificado y listo para simulació
 
 ### 3. Condiciones de Frontera
 * **Entrada de fluido (`inlet`):** Caudal másico constante de 1.21 × 10⁻⁵ kg/s de líquido puro (*α<sub>liquid</sub>* = 1) a temperatura *T<sub>in</sub>* = 300 K.
+* **Régimen hidráulico:** Con ρ = 958.4 kg/m³, μ = 2.8176 × 10⁻⁴ Pa s, D<sub>h</sub> = 200 µm, A<sub>in</sub> = 4.5 × 10⁻⁸ m² y ṁ = 1.21 × 10⁻⁵ kg/s, U<sub>m</sub> = 0.2806 m/s y **Re<sub>Dₕ</sub> = 190.86 (laminar)**.
+
 * **Salida de fluido (`outlet`):** Presión estática de 101325 Pa con condición hidrostática `prghPressure`.
 * **Base caliente (`outerBottom`):** Flujo de calor uniforme *q''* = 100 W/cm² = 10⁶ W/m² (potencia nominal *Q* = 3 W en el dominio representativo).
 * **Laterales exteriores (`outerLeft`, `outerRight`):** `symmetryPlane` en ambas regiones.
@@ -177,6 +179,6 @@ El caso se encuentra completamente preparado, verificado y listo para simulació
   * Superficies de pared mojada y base sólida caliente.
 
 ### 5. Control Numérico y Estabilidad
-* Paso de tiempo adaptativo con maxCo = 0.195, maxDi = 10, Δt<sub>inicial</sub> = 10⁻⁸ s y Δt<sub>max</sub> = 5 × 10⁻⁷ s.
+* Control temporal efectivo: `deltaT 1e-4 s`, `adjustTimeStep yes`, `maxCo 0.195`, `maxDi 10` y `maxDeltaT 1e-4 s`.
 * Frecuencia de escritura: `writeInterval 1e-4 s` con `writeCompression on;` para generar animaciones fluidas optimizando el espacio en disco.
 * El caso está validado localmente con el script de prueba de integración `python3 scripts/check_euler.py`.
