@@ -131,11 +131,11 @@ bash Allclean
 
 ### 6. Reducción de datos e integrales superficiales (Ghani et al., 2017)
 El caso evalúa automáticamente en cada paso de tiempo las variables integrales del artículo mediante el diccionario [system/dataReduction](system/dataReduction):
-* **Caída de presión ($\Delta P$):** Promedios superficiales `inletFluid` y `outletFluid` en $p$ y $p_{rgh}$ ($\Delta P = \bar{p}_{in} - \bar{p}_{out}$).
-* **Temperatura de la base caliente ($T_{base}$):** Promedio superficial `baseSolid` sobre el parche `outerBottom` ($y = -0.20\text{ mm}$, correspondiente a la Fig. 10 del paper).
-* **Temperatura media de la pared convectiva ($T_{W,ave}$):** Promedios superficiales `interfaceFluid` e `interfaceSolid` en la interfaz `fluid_to_solid` / `solid_to_fluid`.
-* **Temperatura media del fluido ($T_{f,ave}$):** Promedio volumétrico `volFluid` en la región `fluid`.
-* **Planos de contorno:** `system/cuttingPlanes` extrae los planos $y = 0\text{ m}$ (plano medio del canal) y $z = 5\text{ mm}$ (corte transversal central).
+* **Caída de presión (ΔP):** Promedios superficiales `inletFluid` y `outletFluid` en *p* y *p*<sub>rgh</sub> (ΔP = p̅<sub>in</sub> - p̅<sub>out</sub>).
+* **Temperatura de la base caliente (T<sub>base</sub>):** Promedio superficial `baseSolid` sobre el parche `outerBottom` (*y* = -0.20 mm, correspondiente a la Fig. 10 del paper).
+* **Temperatura media de la pared convectiva (T<sub>W,ave</sub>):** Promedios superficiales `interfaceFluid` e `interfaceSolid` en la interfaz `fluid_to_solid` / `solid_to_fluid`.
+* **Temperatura media del fluido (T<sub>f,ave</sub>):** Promedio volumétrico `volFluid` en la región `fluid`.
+* **Planos de contorno:** `system/cuttingPlanes` extrae los planos *y* = 0 m (plano medio del canal) y *z* = 5 mm (corte transversal central).
 Los resultados se registran automáticamente en el directorio `postProcessing/`.
 
 ## Estado del caso
@@ -145,38 +145,38 @@ El caso se encuentra completamente preparado, verificado y listo para simulació
 ### 1. Física y Formulación del Solver
 * **Solver activo:** `chtMultiRegionTwoPhaseEulerFoam` (Transferencia de calor conjugada sólido-fluido multifásica transitoria).
 * **Fases interpenetrables:**
-  * `liquid`: Agua líquida con ecuación de estado Boussinesq ($C_p = 4216\text{ J/(kg K)}$, $k = 0.671\text{ W/(m K)}$, $\mu = 2.82 \times 10^{-4}\text{ Pa s}$).
-  * `gas`: Vapor de agua como gas ideal ($C_p = 2030\text{ J/(kg K)}$, $k = 0.0248\text{ W/(m K)}$, $\mu = 1.22 \times 10^{-5}\text{ Pa s}$).
-* **Cambio de fase:** Modelo térmico interfacial (`thermalPhaseChangeTwoPhaseSystem`) con calor latente $L = 2.26\text{ MJ/kg}$ referenciado a $T_{ref} = 373.15\text{ K}$ y $p_{ref} = 101325\text{ Pa}$.
-* **Fuerzas y acoplamiento interfacial:** Arrastre de Schiller–Naumann, transferencia de calor de Ranz–Marshall, masa virtual ($C_{vm} = 0.5$) y diámetro inicial de burbuja/gota de $10\ \mu\text{m}$.
-* **Gravedad:** Activa en dirección transversal $g = (0, -9.81, 0)\text{ m/s}^2$.
+  * `liquid`: Agua líquida con ecuación de estado Boussinesq (*C<sub>p</sub>* = 4216 J/(kg K), *k* = 0.671 W/(m K), *μ* = 2.82 × 10⁻⁴ Pa s).
+  * `gas`: Vapor de agua como gas ideal (*C<sub>p</sub>* = 2030 J/(kg K), *k* = 0.0248 W/(m K), *μ* = 1.22 × 10⁻⁵ Pa s).
+* **Cambio de fase:** Modelo térmico interfacial (`thermalPhaseChangeTwoPhaseSystem`) con calor latente *L* = 2.26 MJ/kg referenciado a *T<sub>ref</sub>* = 373.15 K y *p<sub>ref</sub>* = 101325 Pa.
+* **Fuerzas y acoplamiento interfacial:** Arrastre de Schiller–Naumann, transferencia de calor de Ranz–Marshall, masa virtual (*C<sub>vm</sub>* = 0.5) y diámetro inicial de burbuja/gota de 10 µm.
+* **Gravedad:** Activa en dirección transversal *g* = (0, -9.81, 0) m/s².
 
 ### 2. Geometría y Materiales
-* **Geometría representativa:** Sección en "I" de silicio con 2 medios canales simétricos ($D_h = 200\ \mu\text{m}$, correspondiente al modelo MC-RC de Ghani et al., 2017).
-* **Dominio exterior:** $0.30\text{ mm (ancho X)} \times 0.40\text{ mm (altura Y)} \times 10.0\text{ mm (longitud Z)}$.
-* **Sólido (Silicio):** $k = 130\text{ W/(m K)}$, $C_p = 700\text{ J/(kg K)}$, $\rho = 2329\text{ kg/m}^3$ (valores experimentales de referencia a 300 K).
+* **Geometría representativa:** Sección en "I" de silicio con 2 medios canales simétricos (*D<sub>h</sub>* = 200 µm, correspondiente al modelo MC-RC de Ghani et al., 2017).
+* **Dominio exterior:** 0.30 mm (ancho X) × 0.40 mm (altura Y) × 10.0 mm (longitud Z).
+* **Sólido (Silicio):** *k* = 130 W/(m K), *C<sub>p</sub>* = 700 J/(kg K), *ρ* = 2329 kg/m³ (valores experimentales de referencia a 300 K).
 
 ### 3. Condiciones de Frontera
-* **Entrada de fluido (`inlet`):** Caudal másico constante de $1.21 \times 10^{-5}\text{ kg/s}$ de líquido puro ($\alpha_{liquid} = 1$) a temperatura $T_{in} = 300\text{ K}$.
-* **Salida de fluido (`outlet`):** Presión estática de $101325\text{ Pa}$ con condición hidrostática `prghPressure`.
-* **Base caliente (`outerBottom`):** Flujo de calor uniforme $q'' = 100\text{ W/cm}^2 = 10^6\text{ W/m}^2$ (potencia nominal $Q = 3\text{ W}$ en el dominio representativo).
+* **Entrada de fluido (`inlet`):** Caudal másico constante de 1.21 × 10⁻⁵ kg/s de líquido puro (*α<sub>liquid</sub>* = 1) a temperatura *T<sub>in</sub>* = 300 K.
+* **Salida de fluido (`outlet`):** Presión estática de 101325 Pa con condición hidrostática `prghPressure`.
+* **Base caliente (`outerBottom`):** Flujo de calor uniforme *q''* = 100 W/cm² = 10⁶ W/m² (potencia nominal *Q* = 3 W en el dominio representativo).
 * **Laterales exteriores (`outerLeft`, `outerRight`):** `symmetryPlane` en ambas regiones.
 * **Interfaz sólido-fluido (`solid_to_fluid` / `fluid_to_solid`):** Acoplamiento térmico CHT `compressible::turbulentTemperatureTwoPhaseRadCoupledMixed` con continuidad de flujo de calor y temperatura.
 * **Superficies restantes:** Adiabáticas (`zeroGradient`).
 
 ### 4. Reducción de Datos y Exportación VTK para Animaciones
 * **Integrales numéricas ([system/dataReduction](system/dataReduction)):**
-  * $\Delta P = \bar{p}_{in} - \bar{p}_{out}$ (Caída de presión total).
-  * $T_{base}$ (Temperatura promedio superficial en la base caliente, Fig. 10).
-  * $T_{W,ave}$ (Temperatura promedio de pared mojada para el cálculo de $\text{Nu}_{ave}$).
-  * $T_{f,ave}$ (Temperatura volumétrica media del fluido).
+  * ΔP = p̅<sub>in</sub> - p̅<sub>out</sub> (Caída de presión total).
+  * T<sub>base</sub> (Temperatura promedio superficial en la base caliente, Fig. 10).
+  * T<sub>W,ave</sub> (Temperatura promedio de pared mojada para el cálculo de Nu<sub>ave</sub>).
+  * T<sub>f,ave</sub> (Temperatura volumétrica media del fluido).
 * **Superficies y planos VTK ([system/cuttingPlanes](system/cuttingPlanes)):**
-  * Plano medio longitudinal $y = 0\text{ m}$ (contornos de velocidad, presión y temperatura).
-  * Cortes transversales en $z = 2.5\text{ mm}$, $z = 5.0\text{ mm}$ y $z = 7.5\text{ mm}$.
-  * Isosuperficie 3D de vapor ($\alpha_{gas} = 0.05$) para visualización de burbujas en ParaView.
+  * Plano medio longitudinal *y* = 0 m (contornos de velocidad, presión y temperatura).
+  * Cortes transversales en *z* = 2.5 mm, *z* = 5.0 mm y *z* = 7.5 mm.
+  * Isosuperficie 3D de vapor (*α<sub>gas</sub>* = 0.05) para visualización de burbujas en ParaView.
   * Superficies de pared mojada y base sólida caliente.
 
 ### 5. Control Numérico y Estabilidad
-* Paso de tiempo adaptativo con $\text{maxCo} = 0.195$, $\text{maxDi} = 10$, $\Delta t_{inicial} = 10^{-8}\text{ s}$ y $\Delta t_{max} = 5 \times 10^{-7}\text{ s}$.
+* Paso de tiempo adaptativo con maxCo = 0.195, maxDi = 10, Δt<sub>inicial</sub> = 10⁻⁸ s y Δt<sub>max</sub> = 5 × 10⁻⁷ s.
 * Frecuencia de escritura: `writeInterval 1e-4 s` con `writeCompression on;` para generar animaciones fluidas optimizando el espacio en disco.
 * El caso está validado localmente con el script de prueba de integración `python3 scripts/check_euler.py`.
