@@ -1,94 +1,35 @@
-/*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2406                                  |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
-\*---------------------------------------------------------------------------*/
 FoamFile
 {
-    version     2.0;
-    format      binary;
-    arch        "LSB;label=32;scalar=64";
-    class       volScalarField;
-    location    "0/solid";
-    object      p;
+    version 2.0;
+    format ascii;
+    class volScalarField;
+    object p;
 }
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [1 -1 -2 0 0 0 0];
-
-internalField   uniform 100000;
-
+dimensions [1 -1 -2 0 0 0 0];
+internalField uniform 101325;
 boundaryField
 {
-    solidRight
+    outerTop { type calculated; value uniform 101325; }
+    outerBottom { type calculated; value uniform 101325; }
+    outerLeft
     {
-        type            fixedFluxPressure;
-        gradient        uniform 0;
-        value           uniform 100000;
+        type symmetryPlane;
     }
-    solidLeft
+    outerRight
     {
-        type            fixedFluxPressure;
-        gradient        uniform 0;
-        value           uniform 100000;
+        type symmetryPlane;
     }
-    solidBottomAdiabatic
+    inlet
     {
-        type            fixedFluxPressure;
-        gradient        uniform 0;
-        value           uniform 100000;
+        type calculated; value uniform 101325;
     }
-    solidBottom
+    outlet
     {
-        type            fixedFluxPressure;
-        gradient        uniform 0;
-        value           uniform 100000;
+        type calculated; value uniform 101325;
     }
-    solidTop
+    solid_to_fluid
     {
-        type            fixedFluxPressure;
-        gradient        uniform 0;
-        value           uniform 100000;
-    }
-    front
-    {
-        type            fixedFluxPressure;
-        gradient        uniform 0;
-        value           uniform 100000;
-    }
-    back
-    {
-        type            fixedFluxPressure;
-        gradient        uniform 0;
-        value           uniform 100000;
-    }
-    solidToFluidBottom
-    {
-        type            fixedFluxPressure;
-        gradient        uniform 0;
-        value           uniform 100000;
-    }
-    solidToFluidLeft
-    {
-        type            fixedFluxPressure;
-        gradient        uniform 0;
-        value           uniform 100000;
-    }
-    solidToFluidTop
-    {
-        type            fixedFluxPressure;
-        gradient        uniform 0;
-        value           uniform 100000;
-    }
-    solidToFluidRight
-    {
-        type            fixedFluxPressure;
-        gradient        uniform 0;
-        value           uniform 100000;
+        type calculated; value uniform 101325;
     }
 }
-
-
-// ************************************************************************* //

@@ -1,0 +1,51 @@
+FoamFile
+{
+    version 2.0;
+    format ascii;
+    class dictionary;
+    object phaseProperties;
+}
+
+// Euler-Euler dispersed-phase baseline. Diameter and seed require sensitivity study.
+type thermalPhaseChangeTwoPhaseSystem;
+phases (gas liquid);
+phaseChange on;
+gas { type purePhaseModel; diameterModel constant; constantCoeffs { d 1e-5; } residualAlpha 1e-8; }
+liquid { type purePhaseModel; diameterModel constant; constantCoeffs { d 1e-5; } residualAlpha 1e-8; }
+blending
+{
+    default { type linear; minFullyContinuousAlpha.gas 0.7; minPartlyContinuousAlpha.gas 0.3; minFullyContinuousAlpha.liquid 0.7; minPartlyContinuousAlpha.liquid 0.3; }
+    heatTransfer { type linear; minFullyContinuousAlpha.gas 1; minPartlyContinuousAlpha.gas 0; minFullyContinuousAlpha.liquid 1; minPartlyContinuousAlpha.liquid 0; }
+}
+surfaceTension ((gas and liquid) { type constant; sigma 0.059; });
+saturationModel { type constant; pSat 101325; Tsat 373.15; }
+aspectRatio
+(
+    (gas in liquid) { type constant; E0 1; }
+    (liquid in gas) { type constant; E0 1; }
+);
+drag
+(
+    (gas in liquid) { type SchillerNaumann; residualRe 1e-4; swarmCorrection { type none; } }
+    (liquid in gas) { type SchillerNaumann; residualRe 1e-4; swarmCorrection { type none; } }
+);
+virtualMass
+(
+    (gas in liquid) { type constantCoefficient; Cvm 0.5; }
+    (liquid in gas) { type constantCoefficient; Cvm 0.5; }
+);
+heatTransfer.gas
+(
+    (gas in liquid) { type spherical; residualAlpha 1e-8; }
+    (liquid in gas) { type RanzMarshall; residualAlpha 1e-8; }
+);
+heatTransfer.liquid
+(
+    (gas in liquid) { type RanzMarshall; residualAlpha 1e-8; }
+    (liquid in gas) { type spherical; residualAlpha 1e-8; }
+);
+phaseTransfer ();
+lift ();
+wallLubrication ();
+turbulentDispersion ();
+pMin 20000;

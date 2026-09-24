@@ -30,8 +30,8 @@ boundary
     inlet { type patch; faces ((0 3 2 1)); }
     outlet { type patch; faces ((4 5 6 7)); }
     outerBottom { type wall; faces ((0 1 5 4)); }
-    outerRight { type wall; faces ((1 2 6 5)); }
+    outerRight { type symmetryPlane; faces ((1 2 6 5)); }
     outerTop { type wall; faces ((2 3 7 6)); }
-    outerLeft { type wall; faces ((3 0 4 7)); }
+    outerLeft { type symmetryPlane; faces ((3 0 4 7)); }
 );
 mergePatchPairs ();

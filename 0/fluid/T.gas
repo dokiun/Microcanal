@@ -1,0 +1,33 @@
+FoamFile
+{
+    version 2.0;
+    format ascii;
+    class volScalarField;
+    object T.gas;
+}
+
+dimensions [0 0 0 1 0 0 0];
+internalField uniform 300;
+boundaryField
+{
+    outerLeft
+    {
+        type symmetryPlane;
+    }
+    outerRight
+    {
+        type symmetryPlane;
+    }
+    inlet
+    {
+        type fixedValue; value uniform 300;
+    }
+    outlet
+    {
+        type inletOutlet; phi phi.gas; inletValue uniform 300; value uniform 300;
+    }
+    fluid_to_solid
+    {
+        type copiedFixedValue; sourceFieldName T.liquid; value uniform 300;
+    }
+}

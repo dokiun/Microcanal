@@ -8,8 +8,7 @@
 FoamFile
 {
     version     2.0;
-    format      binary;
-    arch        "LSB;label=32;scalar=64";
+    format      ascii;
     class       volScalarField;
     location    "0/solid";
     object      T;
@@ -18,84 +17,51 @@ FoamFile
 
 dimensions      [0 0 0 1 0 0 0];
 
-internalField   uniform 375;
+internalField   uniform 300;
 
 boundaryField
 {
-    solidRight
+    inlet
     {
         type            zeroGradient;
     }
-    solidLeft
+    outlet
     {
         type            zeroGradient;
     }
-    solidBottomAdiabatic
-    {
-        type            zeroGradient;
-    }
-    solidBottom
+    outerBottom
     {
         type            externalWallHeatFluxTemperature;
         mode            flux;
-        q               uniform 400000;
+        q               uniform 1000000;    // 100 W/cm2 = 1,000,000 W/m2
         kappaMethod     solidThermo;
         kappa           none;
-        value           uniform 375;
+        value           uniform 300;
     }
-    solidTop
+    outerRight
+    {
+        type            symmetryPlane;
+    }
+    outerTop
     {
         type            zeroGradient;
     }
-    front
+    outerLeft
     {
-        type            zeroGradient;
+        type            symmetryPlane;
     }
-    back
+    solid_to_fluid
     {
-        type            zeroGradient;
-    }
-    solidToFluidBottom
-    {
-        type            compressible::turbulentTemperatureRadCoupledMixed;
-        Tnbr            T;
+        type            compressible::turbulentTemperatureTwoPhaseRadCoupledMixed;
+        Tnbr            T.liquid;
+        region          solid;
+        otherPhase      gas;
         kappaMethod     solidThermo;
         qrNbr           none;
         qr              none;
         kappa           none;
-        value           uniform 376;
-    }
-    solidToFluidLeft
-    {
-        type            compressible::turbulentTemperatureRadCoupledMixed;
-        Tnbr            T;
-        kappaMethod     solidThermo;
-        qrNbr           none;
-        qr              none;
-        kappa           none;
-        value           uniform 376;
-    }
-    solidToFluidTop
-    {
-        type            compressible::turbulentTemperatureRadCoupledMixed;
-        Tnbr            T;
-        kappaMethod     solidThermo;
-        qrNbr           none;
-        qr              none;
-        kappa           none;
-        value           uniform 376;
-    }
-    solidToFluidRight
-    {
-        type            compressible::turbulentTemperatureRadCoupledMixed;
-        Tnbr            T;
-        kappaMethod     solidThermo;
-        qrNbr           none;
-        qr              none;
-        kappa           none;
-        value           uniform 376;
+        value           uniform 300;
     }
 }
-
 
 // ************************************************************************* //

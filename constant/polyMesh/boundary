@@ -39,8 +39,8 @@ FoamFile
     }
     outerRight
     {
-        type            wall;
-        inGroups        1(wall);
+        type            symmetryPlane;
+        inGroups        1(symmetryPlane);
         nFaces          1600;
         startFace       36864;
     }
@@ -53,8 +53,8 @@ FoamFile
     }
     outerLeft
     {
-        type            wall;
-        inGroups        1(wall);
+        type            symmetryPlane;
+        inGroups        1(symmetryPlane);
         nFaces          1600;
         startFace       40064;
     }

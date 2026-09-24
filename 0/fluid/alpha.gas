@@ -1,0 +1,33 @@
+FoamFile
+{
+    version 2.0;
+    format ascii;
+    class volScalarField;
+    object alpha.gas;
+}
+
+dimensions [0 0 0 0 0 0 0];
+internalField uniform 1e-6;
+boundaryField
+{
+    outerLeft
+    {
+        type symmetryPlane;
+    }
+    outerRight
+    {
+        type symmetryPlane;
+    }
+    inlet
+    {
+        type fixedValue; value uniform 0;
+    }
+    outlet
+    {
+        type inletOutlet; phi phi.gas; inletValue uniform 0; value uniform 0;
+    }
+    fluid_to_solid
+    {
+        type zeroGradient;
+    }
+}

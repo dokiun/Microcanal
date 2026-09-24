@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  plus                                  |
-|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
+|  \\    /   O peration     | Version:  v2512                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -16,42 +16,38 @@ FoamFile
 
 ddtSchemes
 {
-    default backward; // Euler;
+    default         Euler;
 }
 
 gradSchemes
 {
-    //default         Gauss linear;
-    default cellLimited Gauss linear 0.5;
-    grad(U) faceLimited Gauss linear 1.0;
+    default         Gauss linear;
 }
 
 divSchemes
 {
-    default         Gauss linear;
+    default         none;
 
-    div(phi,U)                          Gauss linearUpwind grad(U);
-    div(phi,K)                          Gauss linear;
-    //div(phi,h)                          Gauss linearUpwind grad(U);
-    //div(phi,k)                          Gauss linearUpwind grad(U);
-    //div(phi,epsilon)                    Gauss linearUpwind grad(U);
-    div(phi,R)                          Gauss linearUpwind grad(U);
-    div(R)                              Gauss linear;
-    div(((rho*nuEff)*dev2(T(grad(U))))) Gauss linear;
-    div(phiv,p)                         Gauss linear;
-    div(phi,e)                          Gauss linearUpwind grad(U);
-    div(rhoCpLPhi,T.water)              Gauss linearUpwind grad(U);
-    div(rhoCpVPhi,T.air)                Gauss linearUpwind grad(U);
-    div(rhoPhi,U)                       Gauss linearUpwind grad(U);
-    div(rhoPhi,T)                       Gauss linearUpwind grad(U);
-    div(rhoPhi,K)                       Gauss linearUpwind grad(U);
+    "div\(phi,alpha.*\)"            Gauss vanLeer;
+    "div\(phir,alpha.*\)"           Gauss vanLeer;
+
+    "div\(alphaRhoPhi.*,U.*\)"      Gauss upwind;
+    "div\(phi.*,U.*\)"              Gauss upwind;
+
+    "div\(alphaRhoPhi.*,Yi\)"       Gauss upwind;
+    "div\(alphaRhoPhi.*,(h|e|f).*\)"  Gauss upwind;
+    "div\(alphaRhoPhi.*,K.*\)"      Gauss upwind;
+    "div\(alphaPhi.*,p\)"           Gauss upwind;
+
+    "div\(alphaRhoPhi.*,(k|epsilon).*\)"  Gauss upwind;
+    "div\(phim,(k|epsilon)m\)"      Gauss upwind;
+
+    "div\(\(\(\(alpha.*\*thermo:rho.*\)\*nuEff.*\)\*dev2\(T\(grad\(U.*\)\)\)\)\)" Gauss linear;
 }
 
 laplacianSchemes
 {
-    default          Gauss linear limited 0.80;
-    //default        Gauss linear uncorrected;
-    //default         Gauss linear corrected;
+    default        Gauss linear corrected;
 }
 
 interpolationSchemes
@@ -61,14 +57,14 @@ interpolationSchemes
 
 snGradSchemes
 {
-    default       limited corrected 0.80;
-    //default         corrected;
-    //default         uncorrected;
+    default         corrected;
 }
 
-fluxRequired
+wallDist
 {
-    p_rgh;
+    method          meshWave;
+    nRequired       yes;
 }
+
 
 // ************************************************************************* //

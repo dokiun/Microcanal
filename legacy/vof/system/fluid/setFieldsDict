@@ -1,0 +1,38 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2406                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system/fluid";
+    object      setFieldsDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// Valor por defecto en todo el canal (Líquido)
+defaultFieldValues
+(
+    volScalarFieldValue alpha.water 1
+);
+
+// Define la zona de vapor cortando con el plano en Y = 300 µm
+regions
+(
+    planeToCell
+    {
+        point   (0 0.0003 0);
+        normal  (0 1 0);
+        fieldValues
+        (
+            volScalarFieldValue alpha.water 0
+        );
+    }
+);
+
+// ************************************************************************* //

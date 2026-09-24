@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v1806                                 |
-|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
+|  \\    /   O peration     | Version:  v2406                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -10,6 +10,7 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
+    location    "system/fluid";
     object      changeDictionaryDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -18,39 +19,26 @@ dictionaryReplacement
 {
     boundary
     {
-        fluidToSolidTop
+        outerLeft
         {
-            type            mappedWall;
-            inGroups        1 ( wall );
-            sampleMode      nearestPatchFace;
-            sampleRegion    solid;
-            samplePatch     solidToFluidTop;
+            type symmetryPlane;
+            inGroups 1 (symmetryPlane);
         }
-        fluidToSolidBottom
+        outerRight
         {
-            type            mappedWall;
-            inGroups        1 ( wall );
-            sampleMode      nearestPatchFace;
-            sampleRegion    solid;
-            samplePatch     solidToFluidBottom;
+            type symmetryPlane;
+            inGroups 1 (symmetryPlane);
         }
-        fluidToSolidLeft
+        fluid_to_solid
         {
             type            mappedWall;
             inGroups        1 ( wall );
             sampleMode      nearestPatchFace;
             sampleRegion    solid;
-            samplePatch     solidToFluidLeft;
-        }
-        fluidToSolidRight
-        {
-            type            mappedWall;
-            inGroups        1 ( wall );
-            sampleMode      nearestPatchFace;
-            sampleRegion    solid;
-            samplePatch     solidToFluidRight;
+            samplePatch     solid_to_fluid;
         }
     }
 }
+
 
 // ************************************************************************* //
