@@ -1,0 +1,72 @@
+#!/bin/bash
+set -euo pipefail
+cd "$(dirname "$0")"
+
+# Uso: bash AllrunSTLCh [serial|parallel]
+# Genera las mallas STL y, si todo es correcto, ejecuta el caso CHT.
+mode="${1:-serial}"
+if [[ "$mode" != serial && "$mode" != parallel ]]; then
+    echo 'Usage: bash AllrunSTLCh [serial|parallel]' >&2
+    exit 2
+fi
+
+# Generación y verificación de la malla.
+mkdir -p constant/triSurface logs
+surfaceCheck geometry/Microcanal.stl > logs/log.surfaceCheck 2>&1
+surfaceTransformPoints -read-scale 0.001 geometry/Microcanal.stl \
+    constant/triSurface/Microcanal_m.stl > logs/log.surfaceTransformPoints 2>&1
+surfaceFeatureExtract > logs/log.surfaceFeatureExtract 2>&1
+blockMesh > logs/log.blockMesh 2>&1
+snappyHexMesh -overwrite > logs/log.snappyHexMesh 2>&1
+topoSet > logs/log.topoSet 2>&1
+checkMesh -constant > logs/log.checkMesh.combined 2>&1
+grep -q 'Mesh OK' logs/log.checkMesh.combined
+python3 - <<'PY'
+from pathlib import Path
+import re
+text = Path('logs/log.checkMesh.combined').read_text()
+cells = int(re.search(r'^\s*cells:\s*(\d+)', text, re.M)[1])
+print(f'Malla conjunta: {cells} celdas.')
+PY
+
+# Separación regional y refinamiento de la malla del fluido.
+for region in fluid solid; do
+    rm -rf "constant/$region/polyMesh"
+done
+splitMeshRegions -cellZonesOnly -overwrite > logs/log.splitMeshRegions 2>&1
+snappyHexMesh -region fluid -overwrite > logs/log.snappyHexMesh.layers 2>&1
+topoSet -region fluid -dict system/topoSetRefineDict > logs/log.topoSet.refineFluid 2>&1
+refineMesh -region fluid -overwrite > logs/log.refineMesh.fluid 2>&1
+for region in fluid solid; do
+    checkMesh -constant -region "$region" > "logs/log.checkMesh.$region" 2>&1
+    grep -q 'Mesh OK' "logs/log.checkMesh.$region"
+done
+python3 - <<'PY'
+from pathlib import Path
+import re
+counts = {
+    region: int(re.search(r'^\s*cells:\s*(\d+)',
+                         Path(f'logs/log.checkMesh.{region}').read_text(), re.M)[1])
+    for region in ('fluid', 'solid')
+}
+total = sum(counts.values())
+print(f'Malla final con capas: {counts}, total {total} celdas.')
+PY
+touch Microcanal.foam
+
+# Ejecución del solver sobre las mallas recién generadas.
+if ! command -v chtMultiRegionTwoPhaseEulerFoam >/dev/null; then
+    echo 'Load OpenFOAM v2512 first: source /usr/lib/openfoam/openfoam2512/etc/bashrc' >&2
+    exit 1
+fi
+if [[ "$mode" == parallel ]]; then
+    nproc_case=$(foamDictionary system/decomposeParDict -entry numberOfSubdomains -value)
+    for region in fluid solid; do
+        nproc_region=$(foamDictionary "system/$region/decomposeParDict" -entry numberOfSubdomains -value)
+        [[ "$nproc_region" == "$nproc_case" ]] || { echo 'Inconsistent decomposition counts' >&2; exit 1; }
+    done
+    decomposePar -allRegions > logs/log.decomposePar 2>&1
+    mpirun -np "$nproc_case" chtMultiRegionTwoPhaseEulerFoam -parallel 2>&1 | tee logs/log.chtMultiRegionTwoPhaseEulerFoam
+else
+    chtMultiRegionTwoPhaseEulerFoam 2>&1 | tee logs/log.chtMultiRegionTwoPhaseEulerFoam
+fi

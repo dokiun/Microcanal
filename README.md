@@ -13,11 +13,11 @@ La simulación se realiza con **OpenFOAM v2512**, usando el solver `chtMultiRegi
 
 ## Geometría del canal
 
-El dominio representa una sección de silicio con dos medios canales simétricos. Las dimensiones exteriores son **0.30 × 0.40 × 10 mm** y el diámetro hidráulico del canal completo es **200 µm**.
+El dominio representa una sección de silicio con dos medios canales simétricos. Las dimensiones exteriores son **0.30 × 0.40 × 5 mm** y el diámetro hidráulico del canal completo es **200 µm**.
 
-![Geometría tridimensional del microcanal](Microcanal.png)
+![Geometría tridimensional del microcanal](imgs/Microcanal.png)
 
-![Vista longitudinal del microcanal](Longitudinal.png)
+![Vista longitudinal del microcanal](imgs/Longitudinal.png)
 
 El modelo se divide en dos regiones:
 
@@ -36,7 +36,7 @@ Las regiones se generan automáticamente a partir de la superficie cerrada `geom
 | Calentamiento de la base | `10⁶ W/m²` |
 | Presión de salida | `101325 Pa` |
 | Material sólido | Silicio |
-| Longitud del dominio | `10 mm` |
+| Longitud del dominio | `5 mm` |
 | Diámetro hidráulico | `200 µm` |
 
 ## Flujo de trabajo
@@ -85,7 +85,7 @@ El caso registra automáticamente en `postProcessing/`:
 - Temperatura media del fluido.
 - Distribución de velocidad, presión, temperatura y fracción de vapor.
 
-La malla final contiene aproximadamente **41 600 celdas**: 33 600 en el fluido y 8 000 en el sólido. Ambas regiones pasan la verificación `checkMesh`.
+La malla base se configura con **32 × 32 × 80 = 81 920 celdas**, concentrando la resolución retirada en z dentro de x e y. La malla final se contabiliza en los logs para las regiones `fluid` y `solid`, y ambas pasan la verificación `checkMesh`.
 
 ## Archivos principales
 

@@ -8,7 +8,7 @@
 FoamFile
 {
     version     2.0;
-    format      binary;
+    format      ascii;
     arch        "LSB;label=32;scalar=64";
     class       polyBoundaryMesh;
     location    "constant/fluid/polyMesh";
@@ -21,35 +21,35 @@ FoamFile
     inlet
     {
         type            patch;
-        nFaces          168;
-        startFace       96632;
+        nFaces          1248;
+        startFace       291872;
     }
     outlet
     {
         type            patch;
-        nFaces          168;
-        startFace       96800;
+        nFaces          1248;
+        startFace       293120;
     }
     outerRight
     {
         type            symmetryPlane;
         inGroups        1(symmetryPlane);
         nFaces          2400;
-        startFace       96968;
+        startFace       294368;
     }
     outerLeft
     {
         type            symmetryPlane;
         inGroups        1(symmetryPlane);
         nFaces          2400;
-        startFace       99368;
+        startFace       296768;
     }
     fluid_to_solid
     {
         type            mappedWall;
         inGroups        2(wall mappedPatch);
-        nFaces          5600;
-        startFace       101768;
+        nFaces          8960;
+        startFace       299168;
         sampleMode      nearestPatchFace;
         sampleRegion    solid;
         samplePatch     solid_to_fluid;

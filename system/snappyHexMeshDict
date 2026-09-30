@@ -19,8 +19,8 @@ geometry
 }
 castellatedMeshControls
 {
-    maxLocalCells 49000;
-    maxGlobalCells 49000;
+    maxLocalCells 79000;
+    maxGlobalCells 79000;
     minRefinementCells 0;
     nCellsBetweenLevels 3;
     features
@@ -40,7 +40,7 @@ castellatedMeshControls
     }
     resolveFeatureAngle 30;
     refinementRegions {};
-    locationInMesh (0.000011 0.000013 0.005013);
+    locationInMesh (0.000011 0.000013 0.002513);
     allowFreeStandingZoneFaces false;
 }
 snapControls

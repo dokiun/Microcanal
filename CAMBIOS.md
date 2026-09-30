@@ -2,9 +2,9 @@
 
 Mallado multirregión desde `geometry/Microcanal.stl`, en milímetros. El STL representa un sólido con sección en I; el fluido ocupa los dos canales laterales.
 
-- Dimensiones exteriores: **0.30 × 0.40 × 10 mm**.
+- Dimensiones exteriores: **0.30 × 0.40 × 5 mm**.
 - Referencia inicial: **MC-RC**, canal rectangular del paper.
-- Cada franja fluida representa medio canal: **0.075 × 0.30 × 10 mm**.
+- Cada franja fluida representa medio canal: **0.075 × 0.30 × 5 mm**.
 - `outerLeft` y `outerRight` son planos `symmetryPlane` en x = ±0.15 mm, en ambas regiones.
 - Canal físico completo: **0.15 × 0.30 mm**; diámetro hidráulico **Dh = 200 µm**. Las caras de simetría no cuentan como paredes mojadas.
 - Regiones: `solid` y `fluid` (ambos canales).
@@ -17,17 +17,17 @@ Con OpenFOAM y Python 3 disponibles, ejecutar desde la raíz:
 bash AllmeshSTL
 ```
 
-Verificado con OpenFOAM v2512. El script ejecuta `blockMesh`, `snappyHexMesh`, `topoSet` y `splitMeshRegions`; añade capas en el fluido y lo refina ×2 en dirección transversal x. Reemplaza las mallas anteriores sin archivarlas y guarda los logs en `logs/`.
+Verificado con OpenFOAM v2512. El script ejecuta `blockMesh`, `snappyHexMesh`, `topoSet` y `splitMeshRegions`; añade capas en el fluido y lo refina ×2 en dirección transversal x. La caja base usa `32×32×80` divisiones, equivalentes a **81 920 celdas base**. Reemplaza las mallas anteriores sin archivarlas y guarda los logs en `logs/`.
 
 Se generan inicialmente **3 capas** junto al sólido, con primera capa nominal de **2 µm** y crecimiento **1.25**. El refinamiento posterior subdivide también las capas normales a x.
 
 | Región | Celdas finales |
 |---|---:|
-| Fluido | 33 600 |
-| Sólido | 8 000 |
-| **Total** | **41 600** |
+| Malla base | 81 920 |
+| Fluido y sólido | Se informa en `logs/log.checkMesh.*` |
+| **Total final** | Se informa en los logs |
 
-Ambas regiones pasan `checkMesh`. El script exige menos de **50 000 celdas** en total.
+Ambas regiones pasan `checkMesh`. Los scripts muestran en los logs la cantidad de celdas de la malla conjunta y el total final por regiones; ya no detienen el proceso por un umbral fijo de celdas.
 
 ## Archivos principales
 
@@ -153,7 +153,7 @@ El caso se encuentra completamente preparado, verificado y listo para simulació
 
 ### 2. Geometría y Materiales
 * **Geometría representativa:** Sección en "I" de silicio con 2 medios canales simétricos (*D<sub>h</sub>* = 200 µm, correspondiente al modelo MC-RC de Ghani et al., 2017).
-* **Dominio exterior:** 0.30 mm (ancho X) × 0.40 mm (altura Y) × 10.0 mm (longitud Z).
+* **Dominio exterior:** 0.30 mm (ancho X) × 0.40 mm (altura Y) × 5.0 mm (longitud Z).
 * **Sólido (Silicio):** *k* = 130 W/(m K), *C<sub>p</sub>* = 700 J/(kg K), *ρ* = 2329 kg/m³ (valores experimentales de referencia a 300 K).
 
 ### 3. Condiciones de Frontera
@@ -174,7 +174,7 @@ El caso se encuentra completamente preparado, verificado y listo para simulació
   * T<sub>f,ave</sub> (Temperatura volumétrica media del fluido).
 * **Superficies y planos VTK ([system/cuttingPlanes](system/cuttingPlanes)):**
   * Plano medio longitudinal *y* = 0 m (contornos de velocidad, presión y temperatura).
-  * Cortes transversales en *z* = 2.5 mm, *z* = 5.0 mm y *z* = 7.5 mm.
+  * Cortes transversales en *z* = 1.25 mm, *z* = 2.5 mm y *z* = 3.75 mm.
   * Isosuperficie 3D de vapor (*α<sub>gas</sub>* = 0.05) para visualización de burbujas en ParaView.
   * Superficies de pared mojada y base sólida caliente.
 
