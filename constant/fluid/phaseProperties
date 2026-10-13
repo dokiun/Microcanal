@@ -18,7 +18,22 @@ blending
     heatTransfer { type linear; minFullyContinuousAlpha.gas 1; minPartlyContinuousAlpha.gas 0; minFullyContinuousAlpha.liquid 1; minPartlyContinuousAlpha.liquid 0; }
 }
 surfaceTension ((gas and liquid) { type constant; sigma 0.059; });
-saturationModel { type constant; pSat 101325; Tsat 373.15; }
+saturationModel
+{
+    type function1;
+    function csvFile;
+    functionCoeffs
+    {
+        nHeaderLine 1;
+        refColumn 0;
+        componentColumns (1);
+        separator ",";
+        mergeSeparators no;
+        file "Tsat_water.csv";
+        outOfBounds clamp;
+        interpolationScheme linear;
+    };
+}
 aspectRatio
 (
     (gas in liquid) { type constant; E0 1; }

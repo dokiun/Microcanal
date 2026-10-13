@@ -31,13 +31,18 @@ Las regiones se generan automáticamente a partir de la superficie cerrada `geom
 | Parámetro | Valor |
 |---|---:|
 | Fluido de entrada | Agua líquida a 300 K |
-| Caudal másico | `1.21 × 10⁻⁵ kg/s` |
-| Régimen | Laminar, `Re = 190.86` |
+| Velocidad de entrada | `1.004 m/s` |
+| Caudal másico | `4.508964 × 10⁻⁵ kg/s` |
+| Régimen | Laminar; `Re` local variable con la temperatura |
 | Calentamiento de la base | `10⁶ W/m²` |
 | Presión de salida | `101325 Pa` |
 | Material sólido | Silicio |
 | Longitud del dominio | `5 mm` |
 | Diámetro hidráulico | `200 µm` |
+
+Las propiedades del agua se interpolan con tablas dependientes de la temperatura
+entre 300 y 373.15 K. El Reynolds inicial de entrada es aproximadamente 200 y
+el campo local `ReDh` se escribe en cada tiempo guardado.
 
 ## Flujo de trabajo
 
@@ -84,6 +89,8 @@ El caso registra automáticamente en `postProcessing/`:
 - Temperatura promedio de la pared en contacto con el fluido.
 - Temperatura media del fluido.
 - Distribución de velocidad, presión, temperatura y fracción de vapor.
+- Campo local de Reynolds `ReDh` y estadísticas mínimo/medio/máximo mediante
+  `scripts/plot_results.py`.
 
 La malla base se configura con **32 × 32 × 80 = 81 920 celdas**, concentrando la resolución retirada en z dentro de x e y. La malla final se contabiliza en los logs para las regiones `fluid` y `solid`, y ambas pasan la verificación `checkMesh`.
 
@@ -94,6 +101,9 @@ La malla base se configura con **32 × 32 × 80 = 81 920 celdas**, concentrando 
 - `AllrunCh`: ejecución de la simulación.
 - `system/`: diccionarios de mallado, condiciones y control numérico.
 - `scripts/check_euler.py`: prueba de integración.
+- `scripts/plot_results.py`: postproceso térmico, hidráulico y Reynolds local.
+- `constant/fluid/Tsat_water.csv`: tabla de temperatura de saturación en función
+  de la presión.
 - `CAMBIOS.md`: documentación técnica completa y registro de configuración.
 
 ## Estado actual

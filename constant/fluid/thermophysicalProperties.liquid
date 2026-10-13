@@ -19,9 +19,9 @@ thermoType
 {
     type            heRhoThermo;
     mixture         pureMixture;
-    transport       const;
-    thermo          hConst;
-    equationOfState rhoConst;
+    transport       tabulated;
+    thermo          hTabulated;
+    equationOfState icoTabulated;
     specie          specie;
     energy          sensibleEnthalpy;
 }
@@ -34,19 +34,47 @@ mixture
     }
     equationOfState
     {
-        rho 958.4; // Constant reference liquid density from the original case at 373.15 K
+        // Water density [kg/m3], valid over the liquid range used here.
+        rho
+        (
+            (300.00 998.0)
+            (320.00 989.40)
+            (340.00 979.50)
+            (360.00 967.40)
+            (373.15 958.40)
+        );
     }
     thermodynamics
     {
-        Cp          4216.0;
         Hf 0;
-        Tref 373.15;
-        Href 0;
+        Sf 0;
+        Cp
+        (
+            (300.00 4179.0)
+            (320.00 4180.0)
+            (340.00 4185.0)
+            (360.00 4200.0)
+            (373.15 4216.0)
+        );
     }
     transport
     {
-        mu          0.00028176;
-        Pr          1.7703430104321904;
+        mu
+        (
+            (300.00 0.001002)
+            (320.00 0.000577)
+            (340.00 0.000422)
+            (360.00 0.000328)
+            (373.15 0.00028176)
+        );
+        kappa
+        (
+            (300.00 0.613)
+            (320.00 0.640)
+            (340.00 0.658)
+            (360.00 0.673)
+            (373.15 0.679)
+        );
     }
 }
 
