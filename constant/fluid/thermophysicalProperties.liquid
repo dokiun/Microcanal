@@ -19,9 +19,9 @@ thermoType
 {
     type            heRhoThermo;
     mixture         pureMixture;
-    transport       const;
-    thermo          hConst;
-    equationOfState rhoConst;
+    transport       tabulated;
+    thermo          hTabulated;
+    equationOfState icoTabulated;
     specie          specie;
     energy          sensibleEnthalpy;
 }

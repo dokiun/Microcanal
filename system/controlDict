@@ -31,4 +31,21 @@ functions
 {
     #include "dataReduction"
     #include "cuttingPlanes"
+
+    ReynoldsLocal
+    {
+        type            exprField;
+        libs            (fieldFunctionObjects);
+        region          fluid;
+        field           ReDh;
+        action          new;
+        autowrite       true;
+        executeControl  writeTime;
+        writeControl    writeTime;
+        readFields      (U.liquid T.liquid rho.liquid);
+        // mu(T) correlation for liquid water, Pa s, 300-373 K.
+        // ReDh = rho*|U|*Dh/mu(T), Dh = 200 micrometres.
+        expression      "rho.liquid*mag(U.liquid)*0.0002/exp(-3.7188 + 578.919/(T.liquid - 137.546))";
+        dimensions      [0 0 0 0 0 0 0];
+    }
 }

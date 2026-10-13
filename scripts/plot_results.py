@@ -6,6 +6,7 @@ Calcula y grafica las magnitudes del artículo Ghani et al. (2017):
 - Temperatura promedio de la base caliente T_base(t) (Fig. 10).
 - Coeficiente convectivo h_ave(t) y Número de Nusselt Nu_ave(t) (Ecs. 11 y 12).
 - Fracción de vapor alpha_gas(t).
+- Estadística del Reynolds local ReDh(x,t) escrito por OpenFOAM.
 """
 from pathlib import Path
 import re
@@ -24,17 +25,52 @@ PLOTS_DIR.mkdir(parents=True, exist_ok=True)
 
 # Geometric and physical parameters (MC-RC Ghani et al., 2017)
 DH = 200e-6        # Diámetro hidráulico (200 µm = 0.0002 m)
-LT = 10e-3         # Longitud del canal (10 mm = 0.010 m)
-A_BASE = 3.0e-6    # Área de la base caliente (0.3 mm x 10 mm = 3e-6 m²)
-A_CONV = 9.0e-6    # Área convectiva mojada nominal (2 x (0.075 + 0.30 + 0.075) mm x 10 mm = 9e-6 m²)
+LT = 5e-3          # Longitud real de la malla (5 mm)
+A_BASE = 1.5e-6    # Área de la base caliente: 0.3 mm x 5 mm
+A_CONV = 4.5e-6    # Área mojada nominal escalada a 5 mm
 Q_FLUX = 1.0e6     # Flujo de calor en la base (100 W/cm² = 1e6 W/m²)
-RHO_FLUID = 958.4  # Densidad de referencia del fluido (kg/m³)
-K_FLUID = 0.671    # Conductividad térmica del fluido (W/(m K))
-CP_FLUID = 4216.0  # Calor específico del fluido (J/(kg K))
-MDOT = 1.21e-5     # Caudal másico total en inlet (kg/s)
+RHO_FLUID = 998.0 # Agua líquida a 300 K (kg/m³)
+K_FLUID = 0.613    # Agua líquida a 300 K (W/(m K))
+CP_FLUID = 4179.0  # Agua líquida a 300 K (J/(kg K))
+MDOT = 4.508964e-5     # Caudal másico total en inlet (kg/s)
 A_INLET = 4.5e-8   # Área de entrada total (4.5e-8 m²)
-U_MEAN = MDOT / (RHO_FLUID * A_INLET) # ~0.2805 m/s
-RE_DH = RHO_FLUID * U_MEAN * DH / 2.8176e-4  # Re_Dh con mu del thermophysicalProperties.liquid
+U_MEAN = MDOT / (RHO_FLUID * A_INLET)
+
+def water_properties(T):
+    """Propiedades interpoladas coherentes con thermophysicalProperties.liquid."""
+    table = np.array([[300.00, 998.0, 0.001002, 0.613], [320.00, 989.40, 0.000577, 0.640], [340.00, 979.50, 0.000422, 0.658], [360.00, 967.40, 0.000328, 0.673], [373.15, 958.40, 0.00028176, 0.679]])
+    Tc = np.clip(np.asarray(T, dtype=float), table[0, 0], table[-1, 0])
+    return tuple(np.interp(Tc, table[:, 0], table[:, i]) for i in (1, 2, 3))
+
+def read_openfoam_scalar_field(path):
+    """Lee un campo escalar OpenFOAM ASCII (uniform o nonuniform)."""
+    if not path.exists():
+        return None
+    text = path.read_text(errors="ignore")
+    m = re.search(r"internalField\s+uniform\s+([0-9.eE+-]+)", text)
+    if m:
+        return np.array([float(m.group(1))])
+    m = re.search(r"internalField\s+nonuniform\s+List<scalar>\s+(\d+)\s*\((.*?)\)\s*;", text, re.S)
+    if not m:
+        return None
+    values = np.fromstring(m.group(2), sep=" ")
+    return values if len(values) == int(m.group(1)) else None
+
+def local_reynolds_statistics():
+    """Obtiene min/medio/max de ReDh para cada tiempo guardado."""
+    rows = []
+    for time_dir in ROOT.iterdir():
+        if not time_dir.is_dir():
+            continue
+        try:
+            time = float(time_dir.name)
+        except ValueError:
+            continue
+        field = time_dir / "fluid" / "ReDh"
+        values = read_openfoam_scalar_field(field)
+        if values is not None and values.size:
+            rows.append((time, float(np.min(values)), float(np.mean(values)), float(np.max(values))))
+    return np.array(sorted(rows)) if rows else None
 
 def load_dat_file(file_path):
     """Lee un archivo .dat de OpenFOAM y extrae encabezados y datos numéricos."""
@@ -102,6 +138,7 @@ def main():
     h_int_f, d_int_f = find_latest_dat("fluid/interfaceFluid")
     h_int_s, d_int_s = find_latest_dat("solid/interfaceSolid")
     h_vol, d_vol = find_latest_dat("fluid/volFluid")
+    re_local = local_reynolds_statistics()
 
     if d_in is None or d_base is None:
         print("No se encontraron suficientes datos en postProcessing/. Ejecuta la simulación primero con AllrunCh.")
@@ -117,7 +154,10 @@ def main():
     p_out = d_out[:, 1] if d_out is not None else np.zeros_like(p_in)
     delta_p = p_in - p_out  # Pa
     delta_p_kpa = delta_p / 1000.0
-    f_app = (2.0 * DH * delta_p) / (LT * RHO_FLUID * (U_MEAN**2))
+    # Propiedades y velocidad media evaluadas con la temperatura local media.
+    rho_hyd, _, _ = water_properties(d_in[:, 3])
+    u_hyd = MDOT / (rho_hyd * A_INLET)
+    f_app = (2.0 * DH * delta_p) / (LT * rho_hyd * (u_hyd**2))
 
     # 3. Variables Térmicas
     # baseSolid: [Time, T]
@@ -131,13 +171,14 @@ def main():
     # volFluid: [Time, T.liquid, T.gas, alpha.gas, p]
     t_fluid = d_vol[:, 1] if d_vol is not None else (d_in[:, 3] + d_out[:, 3]) / 2.0
     t_fluid_c = t_fluid - 273.15
+    rho_fluid, mu_fluid, k_fluid = water_properties(t_fluid)
 
     # 4. Coeficiente convectivo y Nusselt (Ecs. 11 y 12)
     # hav e = (qw * Afilm) / (Aconv * (Tw,ave - Tf,ave))
     # Nuave = have * Dh / kf
     delta_t_conv = np.maximum(t_wall - t_fluid, 1e-4)
     h_ave = (Q_FLUX * A_BASE) / (A_CONV * delta_t_conv)
-    nu_ave = (h_ave * DH) / K_FLUID
+    nu_ave = (h_ave * DH) / k_fluid
 
     # 5. Fracción de vapor
     alpha_gas = d_vol[:, 3] if d_vol is not None else np.zeros_like(times)
@@ -153,7 +194,15 @@ def main():
     print(f"• Coeficiente Convectivo (h) : {h_ave[last_idx]:.2f} W/(m² K)")
     print(f"• Número de Nusselt (Nu_ave) : {nu_ave[last_idx]:.3f}")
     print(f"• Fracción media de vapor    : {alpha_gas[last_idx]:.4e}")
-    print(f"• Número de Reynolds (Re_Dh) : {RE_DH:.2f} (laminar)")
+    if re_local is not None:
+        re_last = re_local[-1]
+        print(f"• Re local [mín/medio/máx]   : {re_last[1]:.2f} / {re_last[2]:.2f} / {re_last[3]:.2f}")
+        np.savetxt(
+            PLOTS_DIR / "reynolds_local.dat", re_local,
+            header="Time[s] ReDh_min ReDh_mean ReDh_max"
+        )
+    else:
+        print("• Re local                   : no se encontró ningún campo fluid/ReDh")
 
     # =========================================================================
     # GENERACIÓN DE GRÁFICAS (ESTILO PAPER ACADÉMICO / ELSEVIER)
@@ -214,7 +263,8 @@ def main():
     ax4.grid(True, linestyle='--', alpha=0.6)
     ax4.legend(loc='best', frameon=True, fontsize=10)
 
-    fig.suptitle(f'Resultados CFD — Microcanal MC-RC (Ghani et al., 2017) — Re_Dh = {RE_DH:.1f}', fontsize=14, fontweight='bold', y=0.99)
+    re_title = (f"ReDh medio final = {re_local[-1, 2]:.1f}" if re_local is not None else "ReDh local no disponible")
+    fig.suptitle(f'Resultados CFD — Microcanal MC-RC (Ghani et al., 2017) — {re_title}', fontsize=14, fontweight='bold', y=0.99)
     plt.tight_layout()
 
     out_png = PLOTS_DIR / "resultados_ghani_mcrc.png"

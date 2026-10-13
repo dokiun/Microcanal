@@ -7,7 +7,7 @@ FoamFile
 }
 
 dimensions [0 0 0 1 0 0 0];
-internalField uniform 300;
+internalField uniform 373.15;
 boundaryField
 {
     outerLeft
@@ -20,14 +20,14 @@ boundaryField
     }
     inlet
     {
-        type fixedValue; value uniform 300;
+        type fixedValue; value uniform 373.15;
     }
     outlet
     {
-        type inletOutlet; phi phi.gas; inletValue uniform 300; value uniform 300;
+        type inletOutlet; phi phi.gas; inletValue uniform 373.15; value uniform 373.15;
     }
     fluid_to_solid
     {
-        type copiedFixedValue; sourceFieldName T.liquid; value uniform 300;
+        type copiedFixedValue; sourceFieldName T.liquid; value uniform 373.15;
     }
 }

@@ -138,6 +138,25 @@ El caso evalúa automáticamente en cada paso de tiempo las variables integrales
 * **Planos de contorno:** `system/cuttingPlanes` extrae los planos *y* = 0 m (plano medio del canal) y *z* = 5 mm (corte transversal central).
 Los resultados se registran automáticamente en el directorio `postProcessing/`.
 
+## Actualización física y de postproceso
+
+- La longitud física y de postproceso es **5 mm**. El área de la base caliente
+  es `1.5e-6 m²` y el área convectiva nominal es `4.5e-6 m²`.
+- El líquido entra a **300 K** y usa tablas de \(\rho(T)\), \(\mu(T)\),
+  \(C_p(T)\) y \(k(T)\) entre 300 y 373.15 K.
+- El vapor inicia y entra a **373.15 K**, consistente con la saturación de
+  referencia, y usa propiedades tabuladas de transporte y calor específico.
+- `constant/fluid/Tsat_water.csv` proporciona \(T_{sat}(p)\) en vez de una
+  temperatura de saturación fija.
+- `ReDh` se calcula durante la simulación como
+  \(Re_{Dh}=\rho(T)|U|D_h/\mu(T)\). `scripts/plot_results.py` lee el campo y
+  escribe `plots/reynolds_local.dat` con valores mínimo, medio y máximo.
+- El factor de fricción y el número de Nusselt del postproceso usan propiedades
+  del líquido dependientes de la temperatura.
+
+El Reynolds de entrada inicial es aproximadamente **60**, no 190.86. El valor
+local puede variar espacial y temporalmente durante el calentamiento.
+
 ## Estado del caso
 
 El caso se encuentra completamente preparado, verificado y listo para simulación con **`chtMultiRegionTwoPhaseEulerFoam` de OpenFOAM v2512**.
@@ -145,8 +164,8 @@ El caso se encuentra completamente preparado, verificado y listo para simulació
 ### 1. Física y Formulación del Solver
 * **Solver activo:** `chtMultiRegionTwoPhaseEulerFoam` (Transferencia de calor conjugada sólido-fluido multifásica transitoria).
 * **Fases interpenetrables:**
-  * `liquid`: Agua líquida con ecuación de estado Boussinesq (*C<sub>p</sub>* = 4216 J/(kg K), *k* = 0.671 W/(m K), *μ* = 2.82 × 10⁻⁴ Pa s).
-  * `gas`: Vapor de agua como gas ideal (*C<sub>p</sub>* = 2030 J/(kg K), *k* = 0.0248 W/(m K), *μ* = 1.22 × 10⁻⁵ Pa s).
+  * `liquid`: Agua líquida con propiedades tabuladas dependientes de la temperatura.
+  * `gas`: Vapor de agua como gas ideal con propiedades tabuladas de transporte y calor específico.
 * **Cambio de fase:** Modelo térmico interfacial (`thermalPhaseChangeTwoPhaseSystem`) con calor latente *L* = 2.26 MJ/kg referenciado a *T<sub>ref</sub>* = 373.15 K y *p<sub>ref</sub>* = 101325 Pa.
 * **Fuerzas y acoplamiento interfacial:** Arrastre de Schiller–Naumann, transferencia de calor de Ranz–Marshall, masa virtual (*C<sub>vm</sub>* = 0.5) y diámetro inicial de burbuja/gota de 10 µm.
 * **Gravedad:** Activa en dirección transversal *g* = (0, -9.81, 0) m/s².
@@ -157,11 +176,12 @@ El caso se encuentra completamente preparado, verificado y listo para simulació
 * **Sólido (Silicio):** *k* = 130 W/(m K), *C<sub>p</sub>* = 700 J/(kg K), *ρ* = 2329 kg/m³ (valores experimentales de referencia a 300 K).
 
 ### 3. Condiciones de Frontera
-* **Entrada de fluido (`inlet`):** Caudal másico constante de 1.21 × 10⁻⁵ kg/s de líquido puro (*α<sub>liquid</sub>* = 1) a temperatura *T<sub>in</sub>* = 300 K.
-* **Régimen hidráulico:** Con ρ = 958.4 kg/m³, μ = 2.8176 × 10⁻⁴ Pa s, D<sub>h</sub> = 200 µm, A<sub>in</sub> = 4.5 × 10⁻⁸ m² y ṁ = 1.21 × 10⁻⁵ kg/s, U<sub>m</sub> = 0.2806 m/s y **Re<sub>Dₕ</sub> = 190.86 (laminar)**.
+* **Entrada de fluido (`inlet`):** Velocidad de entrada de 1.004 m/s, equivalente a un caudal másico de 4.508964 × 10⁻⁵ kg/s de líquido puro (*α<sub>liquid</sub>* = 1) a temperatura *T<sub>in</sub>* = 300 K.
+* **Propiedades de referencia a 300 K:** ρ = 998 kg/m³ y μ = 1.002 × 10⁻³ Pa·s.
+* **Régimen hidráulico:** Reynolds local con propiedades dependientes de la temperatura; en la entrada a 300 K, **Re<sub>Dₕ</sub> = 200 (laminar)**.
 
 * **Salida de fluido (`outlet`):** Presión estática de 101325 Pa con condición hidrostática `prghPressure`.
-* **Base caliente (`outerBottom`):** Flujo de calor uniforme *q''* = 100 W/cm² = 10⁶ W/m² (potencia nominal *Q* = 3 W en el dominio representativo).
+* **Base caliente (`outerBottom`):** Flujo de calor uniforme *q''* = 100 W/cm² = 10⁶ W/m² (potencia nominal *Q* ≈ 1.5 W para la longitud de 5 mm).
 * **Laterales exteriores (`outerLeft`, `outerRight`):** `symmetryPlane` en ambas regiones.
 * **Interfaz sólido-fluido (`solid_to_fluid` / `fluid_to_solid`):** Acoplamiento térmico CHT `compressible::turbulentTemperatureTwoPhaseRadCoupledMixed` con continuidad de flujo de calor y temperatura.
 * **Superficies restantes:** Adiabáticas (`zeroGradient`).
