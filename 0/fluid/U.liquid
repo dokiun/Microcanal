@@ -7,7 +7,7 @@ FoamFile
 }
 
 dimensions [0 1 -1 0 0 0 0];
-internalField uniform (0 0 0.2670797435);
+internalField uniform (0 0 0.853);
 boundaryField
 {
     outerLeft
@@ -20,11 +20,14 @@ boundaryField
     }
     inlet
     {
-        type flowRateInletVelocity; massFlowRate constant 1.21e-5; rho thermo:rho.liquid; extrapolateProfile no; value uniform (0 0 0.2670797435);
+        type fixedValue;
+        value uniform (0 0 0.853);
     }
     outlet
     {
-        type pressureInletOutletVelocity; phi phi.liquid; value uniform (0 0 0);
+        type pressureInletOutletVelocity; 
+        phi phi.liquid; 
+        value uniform (0 0 0);
     }
     fluid_to_solid
     {

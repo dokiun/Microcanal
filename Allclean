@@ -1,8 +1,25 @@
 #!/bin/bash
-# Preserve authored initial fields and geometry. Remove only generated run output.
+# Explicit cleanup for the OpenFOAM case.
+# Keeps the authored initial conditions in 0/ and the geometry files, but removes
+# all generated run results and temporary directories.
 set -euo pipefail
 cd "$(dirname "$0")"
 : "${WM_PROJECT_DIR:?Load OpenFOAM first}"
 source "$WM_PROJECT_DIR/bin/tools/CleanFunctions"
+
+# Remove generated time directories (0.0001, 0.001, ...), but keep 0/
 cleanTimeDirectories
+
+# Remove generated post-processing results
 cleanPostProcessing
+
+# Remove processor subdomains from parallel runs
+rm -rf processor* 2>/dev/null || true
+
+# Remove any residual result folders created by plotting or post-processing
+rm -rf plots postProcessing 2>/dev/null || true
+
+# Optional: remove old logs if you want a completely fresh rerun
+# rm -rf logs/*.log 2>/dev/null || true
+
+echo "Case cleaned. 0/ and geometry remain, generated outputs were removed."
