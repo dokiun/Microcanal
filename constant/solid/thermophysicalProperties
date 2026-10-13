@@ -16,26 +16,45 @@ FoamFile
 
 thermoType
 {
-    type            heSolidThermo;
-    mixture         pureMixture;
-    transport       constIso;
-    thermo          hConst;
-    equationOfState rhoConst;
-    specie          specie;
-    energy          sensibleEnthalpy;
+    type            heSolidThermo;       // Termodinámica para un sólido.
+    mixture         pureMixture;         // El sólido se considera silicio puro.
+    transport       constIso;            // Conductividad isotrópica constante.
+    thermo          hConst;              // Calor específico constante.
+    equationOfState rhoConst;            // Densidad constante.
+    specie          specie;              // Propiedades de la especie sólida.
+    energy          sensibleEnthalpy;    // Variable energética: entalpía sensible.
 }
 
 mixture
 {
-    // Silicon: material and constant-property assumption from Ghani et al. (2017).
-    // Numerical values are external reference data, NOT reported by that paper.
-    // Ioffe NSM, SiGe/basic.html, Si (x=0), 300 K: k=1.3 W/(cm K), Cp=0.7 J/(g K).
-    // https://www.ioffe.ru/SVA/NSM/Semicond/SiGe/basic.html
-    // PDG: density=2.329 g/cm3, atomic mass=28.0855 g/mol.
-    // https://pdg.web.cern.ch/pdg/2020/AtomicNuclearProperties/HTML/silicon_Si.html
-    specie { molWeight 28.0855; }    // kg/kmol
-    transport { kappa 130; }         // W/(m K), held constant
-    thermodynamics { Hf 0; Cp 700; } // J/kg and J/(kg K); Hf is reference enthalpy
-    equationOfState { rho 2329; }    // kg/m3
+    // Silicio con propiedades constantes.
+    // A 300 K: k = 1.3 W/(cm K), Cp = 0.7 J/(g K).
+    // Densidad aproximada: 2.329 g/cm3.
+    specie
+    {
+        // Masa molecular del silicio [kg/kmol].
+        molWeight 28.0855;
+    }
+
+    transport
+    {
+        // Conductividad térmica isotrópica constante [W/(m K)].
+        kappa 130;
+    }
+
+    thermodynamics
+    {
+        // Entalpía de formación de referencia [J/kg].
+        Hf 0;
+
+        // Calor específico constante [J/(kg K)].
+        Cp 700;
+    }
+
+    equationOfState
+    {
+        // Densidad constante del silicio [kg/m3].
+        rho 2329;
+    }
 }
 // ************************************************************************* //

@@ -17,36 +17,46 @@ FoamFile
 
 thermoType
 {
-    type            heRhoThermo;
-    mixture         pureMixture;
-    transport       tabulated;
-    thermo          hTabulated;
-    equationOfState icoTabulated;
-    specie          specie;
-    energy          sensibleEnthalpy;
+    type            heRhoThermo;       // Termodinámica con densidad y entalpía.
+    mixture         pureMixture;       // Agua líquida pura.
+    transport       tabulated;         // Propiedades de transporte tabuladas.
+    thermo          hTabulated;        // Entalpía basada en tablas de temperatura.
+    equationOfState icoTabulated;      // Densidad del líquido prácticamente constante.
+    specie          specie;            // Propiedades de la especie química.
+    energy          sensibleEnthalpy;  // Variable energética: entalpía sensible.
 }
 
 mixture
 {
     specie
     {
-        molWeight   18;  
+        // Masa molecular del agua [kg/kmol].
+        molWeight   18;
     }
     equationOfState
     {
-        rho 997.0; // Water at 300 K, for Re = 200 with U = 0.853 m/s
+        // Densidad del agua a 300 K [kg/m3]. Se mantiene constante.
+        rho 997.0;
     }
     thermodynamics
     {
-        Cp          4179.0;
-        Hf 0;
-        Tref 300.0;
-        Href 0;
+        // Calor específico del agua líquida [J/(kg K)].
+        Cp   4179.0;
+
+        // Referencia de entalpía de formación [J/kg].
+        Hf   0;
+
+        // Temperatura y entalpía de referencia para la entalpía sensible.
+        Tref 300.0; // [K]
+        Href 0;     // [J/kg]
     }
     transport
     {
-        mu          8.5e-4;
-        Pr          5.8;
+        // Viscosidad dinámica del agua líquida [Pa s].
+        mu 8.5e-4;
+
+        // Número de Prandtl usado para obtener la conductividad térmica.
+        Pr 5.8;
     }
 }
 

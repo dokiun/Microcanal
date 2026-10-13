@@ -17,34 +17,44 @@ FoamFile
 
 thermoType
 {
-    type            heRhoThermo;
-    mixture         pureMixture;
-    transport       tabulated;
-    thermo          hTabulated;
-    equationOfState perfectGas;
-    specie          specie;
-    energy          sensibleEnthalpy;
+    type            heRhoThermo;       // Termodinámica con densidad y entalpía.
+    mixture         pureMixture;       // Vapor de agua puro.
+    transport       tabulated;         // Propiedades de transporte tabuladas.
+    thermo          hTabulated;        // Entalpía basada en tablas de temperatura.
+    equationOfState perfectGas;        // Ecuación de gas ideal.
+    specie          specie;            // Propiedades de la especie química.
+    energy          sensibleEnthalpy;  // Variable energética: entalpía sensible.
 }
 
 mixture
 {
     specie
     {
+        // Masa molecular del agua [kg/kmol].
         molWeight   18.015;
     }
     thermodynamics
     {
-        Hf 2260000; // vapor enthalpy offset relative to liquid at Tsat
+    // Desplazamiento de entalpía del vapor respecto al líquido en Tsat.
+    // Representa aproximadamente el calor latente de vaporización [J/kg].
+    Hf 2260000;
         Sf          0;
+        // Calor específico del vapor en función de la temperatura [J/(kg K)].
+        // OpenFOAM interpola linealmente entre estos puntos.
         Cp ((373.15 2030) (423.15 2050) (473.15 2100));
     }
     transport
     {
+        // Viscosidad dinámica del vapor en función de la temperatura [Pa s].
         mu ((373.15 1.22e-5) (423.15 1.35e-5) (473.15 1.48e-5));
+
+        // Conductividad térmica del vapor en función de la temperatura
+        // [W/(m K)].
         kappa ((373.15 0.025) (423.15 0.030) (473.15 0.035));
     }
 }
 
+// Se desactiva el término dp/dt en la ecuación energética.
 dpdt off;
 
 // ************************************************************************* //
