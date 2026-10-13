@@ -1,3 +1,10 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2406                                  |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
 FoamFile
 {
     version 2.0;
@@ -7,26 +14,34 @@ FoamFile
 }
 
 dimensions [0 1 -1 0 0 0 0];
-internalField uniform (0 0 0.267);
-internalField uniform (0 0 1.004);
+
+internalField uniform (0 0 0); \\ como el gas se genera por evaporación y no entra por la entrada (alpha.gas = 0),
+
 boundaryField
 {
     outerLeft
     {
         type symmetryPlane;
     }
+
     outerRight
     {
         type symmetryPlane;
     }
+
     inlet
     {
-        type fixedValue; value uniform (0 0 1.004);
+        type fixedValue;
+        value uniform (0 0 0);
     }
+
     outlet
     {
-        type pressureInletOutletVelocity; phi phi.gas; value uniform (0 0 0);
+        type pressureInletOutletVelocity;
+        phi phi.gas;
+        value uniform (0 0 0);
     }
+
     fluid_to_solid
     {
         type noSlip;

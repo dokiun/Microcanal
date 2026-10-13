@@ -1,3 +1,10 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2406                                  |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
 FoamFile
 {
     version 2.0;
@@ -20,14 +27,27 @@ boundaryField
     }
     inlet
     {
-        type fixedValue; value uniform 373.15;
+        type fixedValue; 
+        value uniform 373.15; \\ temp. de saturacion
     }
     outlet
     {
-        type inletOutlet; phi phi.gas; inletValue uniform 373.15; value uniform 373.15;
+        type inletOutlet; \\ entra y sale
+        phi phi.gas; 
+        inletValue uniform 373.15; 
+        value uniform 373.15;
     }
     fluid_to_solid
     {
-        type copiedFixedValue; sourceFieldName T.liquid; value uniform 373.15;
+        type            compressible::turbulentTemperatureTwoPhaseRadCoupledMixed; \\ la misma de liquig
+        Tnbr            T;
+        kappaMethod     phaseSystem;
+        region          fluid;
+        otherPhase      liquid; \\la otra fase como se llama
+        qrNbr           none;
+        qr              none;
+        value           uniform 373.15;
     }
 }
+
+

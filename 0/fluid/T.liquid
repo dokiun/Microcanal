@@ -1,3 +1,10 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2406                                  |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
 FoamFile
 {
     version 2.0;
@@ -20,14 +27,25 @@ boundaryField
     }
     inlet
     {
-        type fixedValue; value uniform 300;
+        type fixedValue;  
+        value uniform 300;  \\ entrada fija a 300K
     }
     outlet
     {
-        type inletOutlet; phi phi.liquid; inletValue uniform 300; value uniform 300;
+        type inletOutlet; \\ tipo de frontera; entra y sale
+        phi phi.liquid; \\ Utiliza el phi.liquid para determinar si el flujo entra o sale 
+        inletValue uniform 300; \\ si entra, pues a 300K
+        value uniform 300; 
     }
     fluid_to_solid
     {
-        type compressible::turbulentTemperatureTwoPhaseRadCoupledMixed; Tnbr T; kappaMethod phaseSystem; region fluid; otherPhase gas; qrNbr none; qr none; value uniform 300;
+        type compressible::turbulentTemperatureTwoPhaseRadCoupledMixed; \\condición de temperatura par dos fases con Transferencia de calor y radiación
+        Tnbr T;  \\ campo vecino de temperatura
+        kappaMethod phaseSystem; \\ conductividad térmica
+        region fluid;  \\ región vecina 
+        otherPhase gas;  \\ otra fase presente como se llama
+        qrNbr none;  \\ no hay radiación
+        qr none;  \\ no hay radiación
+        value uniform 300; \\ valor de referencia condiciṕn mixta
     }
 }
