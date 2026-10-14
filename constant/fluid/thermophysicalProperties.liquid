@@ -35,16 +35,17 @@ mixture
     }
     equationOfState
     {
-        // Densidad del agua a 300 K [kg/m3]. Se mantiene constante.
-        rho 997.0;
+        // Densidad del agua [kg/m3], tabulada entre 300 y 373.15 K.
+        rho ((300.0 997.0) (373.15 997.0));
     }
     thermodynamics
     {
         // Calor específico del agua líquida [J/(kg K)].
-        Cp   4179.0;
+        Cp ((300.0 4179.0) (373.15 4179.0));
 
         // Referencia de entalpía de formación [J/kg].
         Hf   0;
+        Sf   0;
 
         // Temperatura y entalpía de referencia para la entalpía sensible.
         Tref 300.0; // [K]
@@ -53,10 +54,10 @@ mixture
     transport
     {
         // Viscosidad del agua a 300 K [Pa s].
-        mu 8.50e-4;
+        mu ((300.0 8.50e-4) (373.15 8.50e-4));
 
-        // Número de Prandtl usado para obtener la conductividad térmica.
-        Pr 5.8;
+        // Conductividad térmica del agua líquida [W/(m K)].
+        kappa ((300.0 0.613) (373.15 0.679));
     }
 }
 

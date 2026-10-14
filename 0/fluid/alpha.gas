@@ -1,9 +1,9 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2406                                  |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
+| //      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  //    /   O peration     | Version:  2406                                  |
+|   //  /    A nd           | Website:  www.openfoam.com                      |
+|    ///     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -31,7 +31,7 @@ boundaryField
     }
     outlet
     {
-        type inletOutlet; \\ por si hay flujo inverso
+        type inletOutlet; // por si hay flujo inverso
         phi phi.gas; 
         inletValue uniform 0; 
         value uniform 0;

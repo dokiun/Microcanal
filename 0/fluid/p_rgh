@@ -38,9 +38,9 @@ boundaryField
     }
     fluid_to_solid
     {
-        type zeroGradient; \\ zeroGradient, pero ya está en un U ya coloca noslipt
+        type zeroGradient; // zeroGradient en la interfaz fluido-solido
         value uniform 101325;
     }
 }
 
-\\ fixedFluxPresesure: ajusta la presión dependiendo del flujo de velocidad 
+// fixedFluxPressure ajusta la presión dependiendo del flujo de velocidad.

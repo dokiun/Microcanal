@@ -80,7 +80,7 @@ saturationModel
         componentColumns (1); // Columna de temperatura de saturación [K].
         separator ",";
         mergeSeparators no;
-        file "Tsat_water.csv";
+        file "constant/fluid/Tsat_water.csv";
         outOfBounds clamp;    // Limita valores fuera del rango tabulado.
         interpolationScheme linear;
     }

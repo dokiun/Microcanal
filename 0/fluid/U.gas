@@ -1,9 +1,9 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2406                                  |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
-|    \\/     M anipulation  |                                                 |
+| //      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  //    /   O peration     | Version:  2406                                  |
+|   //  /    A nd           | Website:  www.openfoam.com                      |
+|    ///     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -15,7 +15,7 @@ FoamFile
 
 dimensions [0 1 -1 0 0 0 0];
 
-internalField uniform (0 0 0); \\ como el gas se genera por evaporación y no entra por la entrada (alpha.gas = 0),
+internalField uniform (0 0 0); // el gas se genera por evaporacion y no entra por la entrada
 
 boundaryField
 {

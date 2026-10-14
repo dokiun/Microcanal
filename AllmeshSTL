@@ -2,6 +2,27 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
+# Inicializa OpenFOAM automáticamente en el HPC si aún no está cargado.
+if ! command -v blockMesh >/dev/null 2>&1; then
+    hpc_bashrc=/opt/ohpc/pub/simulationPackages/openfoam/openfoam2506/OpenFOAM-v2506/etc/bashrc
+    if [ -f "$hpc_bashrc" ]; then
+        if command -v module >/dev/null 2>&1; then
+            module load openmpiV2/5.0.7 >/dev/null 2>&1 || true
+            module load openfoam/2506 >/dev/null 2>&1 || true
+        fi
+        # shellcheck disable=SC1090
+        source "$hpc_bashrc"
+    fi
+fi
+
+for command_name in surfaceCheck surfaceTransformPoints surfaceFeatureExtract \
+    blockMesh snappyHexMesh topoSet splitMeshRegions refineMesh checkMesh; do
+    command -v "$command_name" >/dev/null 2>&1 || {
+        echo "Error: no se encuentra $command_name. Carga OpenFOAM antes de ejecutar AllmeshSTL." >&2
+        exit 1
+    }
+done
+
 # Requires an initialized OpenFOAM environment. The input STL is in mm.
 mkdir -p constant/triSurface logs
 surfaceCheck geometry/Microcanal.stl > logs/log.surfaceCheck 2>&1

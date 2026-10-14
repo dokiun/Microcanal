@@ -28,22 +28,22 @@ boundaryField
     inlet
     {
         type fixedValue; 
-        value uniform 373.15; \\ temp. de saturacion
+        value uniform 373.15; // temp. de saturacion
     }
     outlet
     {
-        type inletOutlet; \\ entra y sale
+        type inletOutlet; // entra y sale
         phi phi.gas; 
         inletValue uniform 373.15; 
         value uniform 373.15;
     }
     fluid_to_solid
     {
-        type            compressible::turbulentTemperatureTwoPhaseRadCoupledMixed; \\ la misma de liquig
+        type            compressible::turbulentTemperatureTwoPhaseRadCoupledMixed; // misma condicion que el liquido
         Tnbr            T;
         kappaMethod     phaseSystem;
         region          fluid;
-        otherPhase      liquid; \\la otra fase como se llama
+        otherPhase      liquid; // nombre de la otra fase
         qrNbr           none;
         qr              none;
         value           uniform 373.15;

@@ -31,11 +31,19 @@ boundaryField
     }
     outerBottom
     {
-        type            externalWallHeatFluxTemperature;
-        mode            flux;
-        q               uniform 1000000;    // 100 W/cm2 = 1,000,000 W/m2
-        kappaMethod     solidThermo;
-        kappa           none;
+        // La condicion original se conserva comentada como referencia:
+        // type            externalWallHeatFluxTemperature;
+        // mode            flux;
+        // q               uniform 1000000;
+        // kappaMethod     solidThermo;
+        // kappa           none;
+        //
+        // OpenFOAM 2506 no registra externalWallHeatFluxTemperature.
+        // fixedGradient es la condicion compatible y sigue siendo fisicamente
+        // equivalente: impone el mismo flujo q mediante dT/dn = q/k.
+        // q = 1e6 W/m2, k = 130 W/(m K), dT/dn = 7692.307692 K/m.
+        type            fixedGradient;
+        gradient        uniform 7692.307692;
         value           uniform 300;
     }
     outerRight

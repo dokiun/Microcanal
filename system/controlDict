@@ -39,9 +39,6 @@ maxCapillaryNum 1;
 
 libs
 (
-    "libpostProcess.so"
-    "libfluidThermo.so"
-	"libOpenFOAM.so"
 );
 
 functions
