@@ -7,7 +7,7 @@ FoamFile
 }
 
 dimensions [0 1 -1 0 0 0 0];
-internalField uniform (0 0 0.853);
+internalField uniform (0 0 0.428);
 boundaryField
 {
     outerLeft
@@ -20,8 +20,10 @@ boundaryField
     }
     inlet
     {
-        type fixedValue;
-        value uniform (0 0 0.853);
+        type flowRateInletVelocity;
+        massFlowRate constant 2.57e-5;
+        rho rho;
+        value uniform (0 0 0.426);
     }
     outlet
     {

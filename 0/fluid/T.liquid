@@ -32,10 +32,8 @@ boundaryField
     }
     outlet
     {
-        type inletOutlet; \\ tipo de frontera; entra y sale
-        phi phi.liquid; \\ Utiliza el phi.liquid para determinar si el flujo entra o sale 
-        inletValue uniform 300; \\ si entra, pues a 300K
-        value uniform 300; 
+        type zeroGradient;
+        value uniform 300;
     }
     fluid_to_solid
     {

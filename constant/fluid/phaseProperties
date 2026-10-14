@@ -16,7 +16,7 @@ FoamFile
 // Modelo Euleriano-Euleriano de dos fases con cambio de fase térmico.
 type thermalPhaseChangeTwoPhaseSystem;
 phases (gas liquid);
-phaseChange on; // Activa la evaporación y la condensación.
+phaseChange off; // Desactiva la evaporación y la condensación.
 
 // Diámetros característicos constantes [m]. Son parámetros del modelo y
 // deben verificarse mediante un análisis de sensibilidad.
