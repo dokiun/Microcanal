@@ -4,7 +4,12 @@
 
 Este proyecto analiza la transferencia de calor y el cambio de fase agua–vapor dentro de un microcanal. El objetivo es entender cómo un canal de dimensiones micrométricas puede transportar calor de forma eficiente cuando se calienta una base de silicio.
 
-La simulación se realiza con **OpenFOAM v2512**, usando el solver `chtMultiRegionTwoPhaseEulerFoam`, que permite resolver al mismo tiempo:
+La simulación usa el solver `chtMultiRegionTwoPhaseEulerFoam`, que permite resolver al mismo tiempo. Antes de ejecutar los scripts, carga OpenFOAM:
+
+```bash
+module load openfoam/2506       # clúster
+# source /ruta/real/OpenFOAM/etc/bashrc  # PC
+```
 
 - El flujo de agua líquida y vapor.
 - La transferencia de calor entre el fluido y el sólido.
@@ -27,14 +32,33 @@ El modelo se divide en dos regiones:
 
 Las regiones se generan automáticamente a partir de la superficie cerrada `geometry/Microcanal.stl`. Esto permite modificar la geometría sin redefinir manualmente todo el dominio fluido.
 
-## Condiciones principales
+## Casos con diferentes números de Reynolds
+
+Se han configurado tres casos con la misma geometría general del microcanal,
+propiedades físicas, calentamiento, malla y configuración numérica. La
+variable de comparación es la velocidad de entrada del agua líquida.
+
+| Caso | Reynolds objetivo | Velocidad de entrada | Caudal másico impuesto |
+|---|---:|---:|---:|
+| `MicrocanalRe100V1` | 100 | `0.426 m/s` | `2.57 × 10⁻⁵ kg/s` |
+| `MicrocanalRe400V1` | 400 | `1.7090763 m/s` | `1.0236 × 10⁻⁴ kg/s` |
+| `MicrocanalRe800V1` | 800 | `3.4181527 m/s` | `2.0472 × 10⁻⁴ kg/s` |
+
+El número de Reynolds se calcula con `Re_Dh = ρ U Dh / μ`, usando
+`ρ = 997 kg/m³`, `Dh = 200 µm` y `μ = 8.50×10⁻⁴ Pa·s`. Por tanto, los
+casos representan flujo laminar con `Re_Dh ≈ 100`, `400` y `800`.
+
+Los valores efectivos de velocidad y caudal se encuentran en
+`0/fluid/U.liquid` dentro de cada carpeta.
+
+## Condiciones principales comunes
 
 | Parámetro | Valor |
 |---|---:|
 | Fluido de entrada | Agua líquida a 300 K |
-| Velocidad media de entrada | `0.426 m/s` |
-| Caudal másico de entrada | `1.915 × 10⁻⁵ kg/s` |
-| Régimen | Laminar; `Re_Dh ≈ 100` en la entrada |
+| Velocidad media de entrada | Depende del caso: `0.426`, `1.7090763` o `3.4181527 m/s` |
+| Caudal másico de entrada | Depende del caso: `2.57×10⁻⁵`, `1.0236×10⁻⁴` o `2.0472×10⁻⁴ kg/s` |
+| Régimen | Laminar; `Re_Dh ≈ 100`, `400` u `800` |
 | Calentamiento de la base | `10⁶ W/m²` |
 | Presión de salida | `101325 Pa` |
 | Material sólido | Silicio |
@@ -42,25 +66,35 @@ Las regiones se generan automáticamente a partir de la superficie cerrada `geom
 | Diámetro hidráulico | `200 µm` |
 
 Las propiedades del agua se interpolan con tablas dependientes de la temperatura
-entre 300 y 373.15 K. La velocidad de entrada se seleccionó para obtener un
-Reynolds hidráulico aproximado de 100 mediante:
+entre 300 y 373.15 K. La velocidad de entrada de cada caso se obtiene mediante:
 
 ```text
 Re_Dh = ρ U Dh / μ
 
 U = Re_Dh μ / (ρ Dh)
-  = (100)(8.5×10⁻⁴) / [(997)(200×10⁻⁶)]
-  ≈ 0.426 m/s
 ```
 
 El caudal másico se impone en `0/fluid/U.liquid` mediante `flowRateInletVelocity`:
 
 ```text
-ṁ = ρ U A ≈ 1.915 × 10⁻⁵ kg/s
+ṁ = ρ U A
 ```
 
-El valor de `ṁ` depende del área transversal efectiva de entrada. El campo local
-`ReDh` se escribe en cada tiempo guardado.
+El campo local `ReDh` se escribe en cada tiempo guardado.
+
+## Parámetros comunes de los tres casos
+
+| Grupo | Parámetros |
+|---|---|
+| Geometría fluida | Ancho `150 µm`, alto `300 µm`, longitud `5 mm`, `Dh = 200 µm` |
+| Sólido | Silicio; dominio exterior `0.30 × 0.50 × 5 mm` |
+| Fluido | Agua a `300 K`, `ρ = 997 kg/m³`, `μ = 8.50×10⁻⁴ Pa·s`, `Cp = 4179 J/(kg·K)` |
+| Calentamiento | Flujo de calor en la base `10⁶ W/m²` (`100 W/cm²`) |
+| Malla base fluida | `50 × 50 × 80 = 200000` celdas, refinada hacia las paredes |
+| Malla sólida | Aproximadamente `960000` celdas en la configuración documentada |
+| Tiempo | `endTime = 0.1 s`, `deltaT inicial = 10⁻⁸ s`, escritura cada `0.01 s` |
+| Paralelización | `4` subdominios |
+| Solver | `chtMultiRegionTwoPhaseEulerFoam` |
 
 ## Flujo de trabajo
 
@@ -71,25 +105,25 @@ Generación y refinamiento de la malla
      ↓
 Separación de regiones sólido–fluido
      ↓
-Simulación conjugada multifásica sin cambio de fase
+Simulación conjugada multifásica con modelo de cambio de fase configurado
      ↓
 Análisis de temperatura, vapor y caída de presión
 ```
 
 ## Cómo ejecutar el caso
 
-Desde la raíz del proyecto:
+Desde la carpeta de cada caso:
 
 ```bash
-source /usr/lib/openfoam/openfoam2512/etc/bashrc
+cd MicrocanalRe100V1   # o MicrocanalRe400V1 / MicrocanalRe800V1
 bash AllmeshSTL
-bash AllrunCh
+bash Allrun
 ```
 
 Para ejecutar en paralelo con cuatro núcleos:
 
 ```bash
-bash AllrunCh parallel
+bash Allrun parallel
 ```
 
 La prueba rápida de integración puede ejecutarse con:
@@ -110,13 +144,17 @@ El caso registra automáticamente en `postProcessing/`:
 - Campo local de Reynolds `ReDh` y estadísticas mínimo/medio/máximo mediante
   `scripts/plot_results.py`.
 
-La malla base se configura con **32 × 32 × 80 = 81 920 celdas**, concentrando la resolución retirada en z dentro de x e y. La malla final se contabiliza en los logs para las regiones `fluid` y `solid`, y ambas pasan la verificación `checkMesh`.
+La malla base fluida se configura con **50 × 50 × 80 = 200 000 celdas**,
+concentrando la resolución hacia las paredes en x e y. La malla final se
+contabiliza en los logs para las regiones `fluid` y `solid`, y ambas deben
+pasar la verificación `checkMesh`.
 
 ## Archivos principales
 
-- `geometry/Microcanal.stl`: geometría del microcanal.
+- `MicrocanalRe100V1/`, `MicrocanalRe400V1/` y `MicrocanalRe800V1/`: casos con `Re_Dh` aproximado de 100, 400 y 800.
+- `geometry/Microcanal.stl`: geometría del microcanal, común a los casos.
 - `AllmeshSTL`: generación de la malla multirregión.
-- `AllrunCh`: ejecución de la simulación.
+- `Allrun`: ejecución de la simulación.
 - `system/`: diccionarios de mallado, condiciones y control numérico.
 - `scripts/check_euler.py`: prueba de integración.
 - `scripts/plot_results.py`: postproceso térmico, hidráulico y Reynolds local.
@@ -126,4 +164,7 @@ La malla base se configura con **32 × 32 × 80 = 81 920 celdas**, concentrando 
 
 ## Estado actual
 
-El caso está preparado para generar la malla, ejecutar la simulación y visualizar los resultados en ParaView. El siguiente paso es comparar la temperatura, la generación de vapor y la caída de presión para diferentes condiciones de operación.
+Los tres casos están preparados para generar la malla, ejecutar la simulación y
+visualizar los resultados en ParaView. La comparación principal debe hacerse
+entre la temperatura, la generación de vapor, la caída de presión y el campo
+local de Reynolds para `Re_Dh ≈ 100`, `400` y `800`.

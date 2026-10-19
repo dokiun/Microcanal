@@ -1,6 +1,0 @@
-processor**
-channel3DV**
-**.out
-**.err
-**.stats
-runLog
