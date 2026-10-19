@@ -1,0 +1,146 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2406                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system/fluid";
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    alpha.water
+    {
+        advectionScheme isoAdvection;
+        reconstructionScheme isoAlpha;
+        
+        solver          smoothSolver;
+        smoother        symGaussSeidel;
+        tolerance       1e-8;
+        relTol          0;
+        
+        vof2IsoTol      1e-8;
+        surfCellTol     1e-6;
+        snapTol         1e-10;
+        writeVTK        false;
+    }
+
+    psiFinal
+    {
+        solver           PCG;
+        preconditioner   DIC;
+        tolerance        1e-7;
+        relTol           0.00;
+    }
+
+    rhoCpLFinal
+    {
+        solver           diagonal;
+        preconditioner   DILU;
+        tolerance        1e-7;
+        relTol           0.1;
+    }
+
+    rhoCpVFinal
+    {
+        solver           diagonal;
+        preconditioner   DILU;
+        tolerance        1e-7;
+        relTol           0.1;
+    }
+
+    rho
+    {
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-6;
+        relTol          1e-4;
+    }
+
+    rhoFinal
+    {
+        $rho;
+        tolerance       1e-7;
+        relTol          0;
+    }
+
+    p_rgh
+    {
+        solver           GAMG;
+        tolerance        1e-6;
+        relTol           1e-4;
+        smoother         DIC;
+        minIter          1;
+    }
+
+    p_rghFinal
+    {
+        $p_rgh;
+        tolerance        1e-7;
+        relTol           0;
+        minIter          1;
+    }
+
+    "(U|h|T.*|k|epsilon|R)"
+    {
+        solver           smoothSolver;
+        smoother         symGaussSeidel;
+        tolerance        1e-7;
+        relTol           1e-5;
+        minIter          1;      // Optimizado: evita 10 iteraciones innecesarias cuando ya convergió
+    }
+
+    "(U|h|T.*|k|epsilon|R)Final"
+    {
+        $U;
+        tolerance        5e-8;
+        relTol           0;
+        minIter          1;
+    }
+}
+
+PIMPLE
+{
+    momentumPredictor   yes;
+    nCorrectors         5;
+    nOuterCorrectors    4;
+    nNonOrthogonalCorrectors 2;
+    pMinFactor          0.5;
+    pMaxFactor          1.8;
+
+    residualControl
+    {
+        p               1e-4;
+        U               1e-5;
+        h               1e-4;
+    }
+}
+
+relaxationFactors
+{
+    fields
+    {
+        p               0.72;
+        p_rgh           0.72;
+        rho             0.80;
+    }
+    equations
+    {
+        "h.*"           0.80;
+        T               0.70;
+        "U.*"           0.87;
+        U               0.87;
+        "(alpha.*)"     0.5;
+        "(k|epsilon)"   0.70;
+    }
+}
+
+// ************************************************************************* //

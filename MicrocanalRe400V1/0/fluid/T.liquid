@@ -1,0 +1,49 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| //      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  //    /   O peration     | Version:  2406                                  |
+|   //  /    A nd           | Website:  www.openfoam.com                      |
+|    ///     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version 2.0;
+    format ascii;
+    class volScalarField;
+    object T.liquid;
+}
+
+dimensions [0 0 0 1 0 0 0];
+internalField uniform 300;
+boundaryField
+{
+    outerLeft
+    {
+        type symmetryPlane;
+    }
+    outerRight
+    {
+        type symmetryPlane;
+    }
+    inlet
+    {
+        type fixedValue;  
+        value uniform 300;  // entrada fija a 300 K
+    }
+    outlet
+    {
+        type zeroGradient;
+        value uniform 300;
+    }
+    fluid_to_solid
+    {
+        type compressible::turbulentTemperatureTwoPhaseRadCoupledMixed; //condición de temperatura par dos fases con Transferencia de calor y radiación
+        Tnbr T;  // campo vecino de temperatura
+        kappaMethod phaseSystem; // conductividad térmica
+        region fluid;  // región vecina 
+        otherPhase gas;  // otra fase presente como se llama
+        qrNbr none;  // no hay radiación
+        qr none;  // no hay radiación
+        value uniform 300; // valor de referencia condiciṕn mixta
+    }
+}

@@ -1,0 +1,31 @@
+# ================================================================
+# Microcanal / OpenFOAM
+# Reglas comunes para todos los casos actuales y futuros.
+# ================================================================
+
+# Resultados y datos generados por OpenFOAM
+MicrocanalRe*/postProcessing/
+MicrocanalRe*/processor*/
+MicrocanalRe*/dynamicCode/
+MicrocanalRe*/[1-9]*/
+MicrocanalRe*/[0-9]*.[0-9]*/
+MicrocanalRe*/[0-9]*e[+-][0-9]*/
+
+# Logs, salidas del clúster y archivos temporales
+MicrocanalRe*/logs
+MicrocanalRe*/slurm-*.out
+MicrocanalRe*/slurm-*.err
+MicrocanalRe*/.DS_Store
+MicrocanalRe*/*~
+MicrocanalRe*/*.swp
+MicrocanalRe*/*.swo
+
+# Archivos de visualización y resultados exportados
+MicrocanalRe*/*.foam
+MicrocanalRe*/*.vtk
+MicrocanalRe*/*.vtp
+
+# Archivos generados por herramientas de malla
+MicrocanalRe*/constant/polyMesh/sets/
+MicrocanalRe*/constant/*/polyMesh/sets/
+MicrocanalRe*/constant/extendedFeatureEdgeMesh/

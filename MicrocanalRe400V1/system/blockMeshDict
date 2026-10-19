@@ -1,0 +1,37 @@
+FoamFile
+{
+    version 2.0;
+    format ascii;
+    class dictionary;
+    object blockMeshDict;
+}
+
+// Background box for geometry/Microcanal.stl, interpreted in millimetres.
+// Outer rectangular envelope: solid I plus two lateral fluid channels.
+scale 0.001;
+vertices
+(
+    (-0.15 -0.20 0)
+    ( 0.15 -0.20 0)
+    ( 0.15  0.20 0)
+    (-0.15  0.20 0)
+    (-0.15 -0.20 5)
+    ( 0.15 -0.20 5)
+    ( 0.15  0.20 5)
+    (-0.15  0.20 5)
+);
+blocks
+(
+    hex (0 1 2 3 4 5 6 7) (64 64 160) simpleGrading (1 1 1)
+);
+edges ();
+boundary
+(
+    inlet { type patch; faces ((0 3 2 1)); }
+    outlet { type patch; faces ((4 5 6 7)); }
+    outerBottom { type wall; faces ((0 1 5 4)); }
+    outerRight { type symmetryPlane; faces ((1 2 6 5)); }
+    outerTop { type wall; faces ((2 3 7 6)); }
+    outerLeft { type symmetryPlane; faces ((3 0 4 7)); }
+);
+mergePatchPairs ();
