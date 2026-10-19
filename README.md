@@ -6,12 +6,7 @@ Este proyecto analiza la transferencia de calor y el cambio de fase agua–vapor
 
 La simulación usa el solver `chtMultiRegionTwoPhaseEulerFoam`, que permite resolver al mismo tiempo. Antes de ejecutar los scripts, carga OpenFOAM:
 
-```bash
-module load openfoam/2506       # clúster
-# source /ruta/real/OpenFOAM/etc/bashrc  # PC
-```
-
-- El flujo de agua líquida y vapor.
+- El flujo de agua líquida.
 - La transferencia de calor entre el fluido y el sólido.
 - El transporte de las fases líquida y gaseosa; el cambio de fase está
   actualmente desactivado para esta configuración.
@@ -21,9 +16,9 @@ module load openfoam/2506       # clúster
 
 El dominio representa una sección de silicio con dos medios canales simétricos. Las dimensiones exteriores son **0.30 × 0.40 × 5 mm** y el diámetro hidráulico del canal completo es **200 µm**.
 
-![Geometría tridimensional del microcanal](imgs/Microcanal.png)
+![Geometría tridimensional del microcanal](MicrocanalRe100V1/imgs/Microcanal.png)
 
-![Vista longitudinal del microcanal](imgs/Longitudinal.png)
+![Vista longitudinal del microcanal](MicrocanalRe100V1/imgs/Longitudinal.png)
 
 El modelo se divide en dos regiones:
 
