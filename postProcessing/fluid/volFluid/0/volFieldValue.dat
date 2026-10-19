@@ -1,4 +1,0 @@
-# Region        : all fluid
-# Cells         : 645120
-# Volume        : 2.25000000e-10
-# Time          	volAverage(T.liquid)	volAverage(T.gas)	volAverage(alpha.gas)	volAverage(p)
