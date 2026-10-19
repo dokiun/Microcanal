@@ -1,0 +1,65 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  plus                                  |
+|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object thermophysicalProperties.liquid;
+} 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+thermoType
+{
+    type            heRhoThermo;       // Termodinámica con densidad y entalpía.
+    mixture         pureMixture;       // Agua líquida pura.
+    transport       tabulated;         // Propiedades de transporte tabuladas.
+    thermo          hTabulated;        // Entalpía basada en tablas de temperatura.
+    equationOfState icoTabulated;      // Densidad del líquido prácticamente constante.
+    specie          specie;            // Propiedades de la especie química.
+    energy          sensibleEnthalpy;  // Variable energética: entalpía sensible.
+}
+
+mixture
+{
+    specie
+    {
+        // Masa molecular del agua [kg/kmol].
+        molWeight   18;
+    }
+    equationOfState
+    {
+        // Densidad del agua [kg/m3], tabulada entre 300 y 373.15 K.
+        rho ((300.0 997.0) (373.15 997.0));
+    }
+    thermodynamics
+    {
+        // Calor específico del agua líquida [J/(kg K)].
+        Cp ((300.0 4179.0) (373.15 4179.0));
+
+        // Referencia de entalpía de formación [J/kg].
+        Hf   0;
+        Sf   0;
+
+        // Temperatura y entalpía de referencia para la entalpía sensible.
+        Tref 300.0; // [K]
+        Href 0;     // [J/kg]
+    }
+    transport
+    {
+        // Viscosidad del agua a 300 K [Pa s].
+        mu ((300.0 8.50e-4) (373.15 8.50e-4));
+
+        // Conductividad térmica del agua líquida [W/(m K)].
+        kappa ((300.0 0.613) (373.15 0.679));
+    }
+}
+
+
+// ************************************************************************* //

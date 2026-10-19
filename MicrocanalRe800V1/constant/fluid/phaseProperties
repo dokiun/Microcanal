@@ -1,0 +1,141 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2406                                  |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version 2.0;
+    format ascii;
+    class dictionary;
+    object phaseProperties;
+}
+
+// Modelo Euleriano-Euleriano de dos fases con cambio de fase térmico.
+type thermalPhaseChangeTwoPhaseSystem;
+phases (gas liquid);
+phaseChange off; // Desactiva la evaporación y la condensación.
+
+// Diámetros característicos constantes [m]. Son parámetros del modelo y
+// deben verificarse mediante un análisis de sensibilidad.
+gas
+{
+    type purePhaseModel;
+    diameterModel constant;
+    constantCoeffs { d 1e-5; }
+    residualAlpha 1e-8; // Fracción numérica mínima de gas.
+}
+
+liquid
+{
+    type purePhaseModel;
+    diameterModel constant;
+    constantCoeffs { d 1e-5; }
+    residualAlpha 1e-8; // Fracción numérica mínima de líquido.
+}
+
+// Interpolación de los modelos entre los límites de fase continua y dispersa.
+blending
+{
+    default
+    {
+        type linear;
+        minFullyContinuousAlpha.gas 0.7;
+        minPartlyContinuousAlpha.gas 0.3;
+        minFullyContinuousAlpha.liquid 0.7;
+        minPartlyContinuousAlpha.liquid 0.3;
+    }
+    heatTransfer
+    {
+        type linear;
+        minFullyContinuousAlpha.gas 1;
+        minPartlyContinuousAlpha.gas 0;
+        minFullyContinuousAlpha.liquid 1;
+        minPartlyContinuousAlpha.liquid 0;
+    }
+}
+
+// Tensión superficial agua-vapor [N/m].
+surfaceTension
+(
+    (gas and liquid)
+    {
+        type constant;
+        sigma 0.059;
+    }
+);
+
+// Temperatura de saturación en función de la presión. El CSV se busca
+// relativo a constant/fluid/.
+saturationModel
+{
+    type function1;
+    function csvFile;
+    functionCoeffs
+    {
+        nHeaderLine 1;        // Omite la cabecera del CSV: p,Tsat.
+        refColumn 0;          // Columna de presión [Pa].
+        componentColumns (1); // Columna de temperatura de saturación [K].
+        separator ",";
+        mergeSeparators no;
+        file "constant/fluid/Tsat_water.csv";
+        outOfBounds clamp;    // Limita valores fuera del rango tabulado.
+        interpolationScheme linear;
+    }
+}
+
+// E0 = 1 representa estructuras dispersas esféricas.
+aspectRatio
+(
+    (gas in liquid) { type constant; E0 1; }
+    (liquid in gas) { type constant; E0 1; }
+);
+
+// Arrastre entre fases. Schiller-Naumann es un modelo inicial estándar
+// para fases dispersas aproximadamente esféricas.
+drag
+(
+    (gas in liquid)
+    {
+        type SchillerNaumann;
+        residualRe 1e-4;
+        swarmCorrection { type none; }
+    }
+    (liquid in gas)
+    {
+        type SchillerNaumann;
+        residualRe 1e-4;
+        swarmCorrection { type none; }
+    }
+);
+
+// Coeficiente de fuerza de masa virtual.
+virtualMass
+(
+    (gas in liquid) { type constantCoefficient; Cvm 0.5; }
+    (liquid in gas) { type constantCoefficient; Cvm 0.5; }
+);
+
+// Correlaciones de transferencia de calor entre fases.
+heatTransfer.gas
+(
+    (gas in liquid) { type spherical; residualAlpha 1e-8; }
+    (liquid in gas) { type RanzMarshall; residualAlpha 1e-8; }
+);
+heatTransfer.liquid
+(
+    (gas in liquid) { type RanzMarshall; residualAlpha 1e-8; }
+    (liquid in gas) { type spherical; residualAlpha 1e-8; }
+);
+
+// No se activan modelos adicionales de sustentación, lubricación de pared
+// ni dispersión turbulenta. El cambio de fase térmico sigue activo arriba.
+phaseTransfer ();
+lift ();
+wallLubrication ();
+turbulentDispersion ();
+
+// Límite inferior de presión usado por el modelo de cambio de fase [Pa].
+pMin 20000;
