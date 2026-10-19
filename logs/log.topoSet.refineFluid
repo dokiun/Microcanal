@@ -1,0 +1,37 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2506                                  |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+Build  : _615aae61d7-20250627 OPENFOAM=2506 version=v2506
+Arch   : "LSB;label=32;scalar=64"
+Exec   : topoSet -region fluid -dict system/topoSetRefineDict
+Date   : Oct 15 2026
+Time   : 17:30:30
+Host   : unal-master
+PID    : 26867
+I/O    : uncollated
+Case   : /home/jvargasri/refrigeracionMicrocanales/MicrocanalRe800
+nProcs : 1
+trapFpe: Floating point exception trapping enabled (FOAM_SIGFPE).
+fileModificationChecking : Monitoring run-time modified files using timeStampMaster (fileModificationSkew 5, maxFileModificationPolls 20)
+allowSystemOperations : Allowing user-supplied system call operations
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+Create time
+
+Create polyMesh fluid for time = 0
+
+Reading topoSetRefineDict
+
+Time = 0
+    mesh not changed.
+Created cellSet fluidRefinement
+    Applying source boxToCell
+    Adding cells with centre within boxes 1((-0.001 -0.001 -0.001) (0.001 0.001 0.011))
+    cellSet fluidRefinement now size 322560
+
+End
+

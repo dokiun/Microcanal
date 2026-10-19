@@ -1,0 +1,106 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2506                                  |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      binary;
+    arch        "LSB;label=32;scalar=64";
+    class       polyBoundaryMesh;
+    location    "constant/solid/polyMesh";
+    object      boundary;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+10
+(
+    inlet
+    {
+        type            patch;
+        nFaces          928;
+        startFace       298860;
+    }
+    outlet
+    {
+        type            patch;
+        nFaces          0;
+        startFace       299788;
+    }
+    outerBottom
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          5386;
+        startFace       299788;
+    }
+    outerRight
+    {
+        type            symmetryPlane;
+        inGroups        1(symmetryPlane);
+        nFaces          656;
+        startFace       305174;
+    }
+    outerTop
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          0;
+        startFace       305830;
+    }
+    outerLeft
+    {
+        type            symmetryPlane;
+        inGroups        1(symmetryPlane);
+        nFaces          688;
+        startFace       305830;
+    }
+    solid_to_fluid
+    {
+        type            mappedWall;
+        inGroups        2(wall mappedPatch);
+        nFaces          6430;
+        startFace       306518;
+        sampleMode      nearestPatchFace;
+        sampleRegion    fluid;
+        samplePatch     fluid_to_solid;
+    }
+    procBoundary1to0
+    {
+        type            processor;
+        inGroups        1(processor);
+        nFaces          3104;
+        startFace       312948;
+        matchTolerance  0.0001;
+        transform       unknown;
+        myProcNo        1;
+        neighbProcNo    0;
+    }
+    procBoundary1to2
+    {
+        type            processor;
+        inGroups        1(processor);
+        nFaces          396;
+        startFace       316052;
+        matchTolerance  0.0001;
+        transform       unknown;
+        myProcNo        1;
+        neighbProcNo    2;
+    }
+    procBoundary1to3
+    {
+        type            processor;
+        inGroups        1(processor);
+        nFaces          1492;
+        startFace       316448;
+        matchTolerance  0.0001;
+        transform       unknown;
+        myProcNo        1;
+        neighbProcNo    3;
+    }
+)
+
+// ************************************************************************* //

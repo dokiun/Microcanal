@@ -1,0 +1,206 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2506                                  |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+Build  : _615aae61d7-20250627 OPENFOAM=2506 version=v2506
+Arch   : "LSB;label=32;scalar=64"
+Exec   : chtMultiRegionTwoPhaseEulerFoam
+Date   : Oct 15 2026
+Time   : 17:31:16
+Host   : unal-master
+PID    : 27618
+I/O    : uncollated
+Case   : /home/jvargasri/refrigeracionMicrocanales/MicrocanalRe800
+nProcs : 1
+trapFpe: Floating point exception trapping enabled (FOAM_SIGFPE).
+fileModificationChecking : Monitoring run-time modified files using timeStampMaster (fileModificationSkew 5, maxFileModificationPolls 20)
+allowSystemOperations : Allowing user-supplied system call operations
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+Create time
+
+Create fluid mesh for region fluid for time = 0
+
+Create solid mesh for region solid for time = 0
+
+*** Reading fluid mesh thermophysical properties for region fluid
+
+
+PIMPLE: Operating solver in PISO mode
+
+    Adding to phaseSystemFluid
+
+Selecting twoPhaseSystem thermalPhaseChangeTwoPhaseSystem
+Selecting phaseModel for gas: purePhaseModel
+Selecting diameterModel for phase gas: constant
+Selecting thermodynamics package 
+{
+    type            heRhoThermo;
+    mixture         pureMixture;
+    transport       tabulated;
+    thermo          hTabulated;
+    equationOfState perfectGas;
+    specie          specie;
+    energy          sensibleEnthalpy;
+}
+
+Calculating face flux field phi.gas
+Selecting turbulence model type laminar
+Selecting laminar stress model Stokes
+Selecting phaseModel for liquid: purePhaseModel
+Selecting diameterModel for phase liquid: constant
+Selecting thermodynamics package 
+{
+    type            heRhoThermo;
+    mixture         pureMixture;
+    transport       tabulated;
+    thermo          hTabulated;
+    equationOfState icoTabulated;
+    specie          specie;
+    energy          sensibleEnthalpy;
+}
+
+Calculating face flux field phi.liquid
+Selecting turbulence model type laminar
+Selecting laminar stress model Stokes
+No MRF models present
+
+Selecting default blending method: linear
+Selecting heatTransfer blending method: linear
+Selecting surfaceTensionModel for (gas and liquid): constant
+Selecting aspectRatioModel for (gas in liquid): constant
+Selecting aspectRatioModel for (liquid in gas): constant
+Selecting dragModel for (gas in liquid): SchillerNaumann
+Selecting swarmCorrection for (gas in liquid): none
+Selecting dragModel for (liquid in gas): SchillerNaumann
+Selecting swarmCorrection for (liquid in gas): none
+Selecting virtualMassModel for (gas in liquid): constantCoefficient
+Selecting virtualMassModel for (liquid in gas): constantCoefficient
+Selecting heatTransferModel for (gas in liquid): spherical
+Selecting heatTransferModel for (liquid in gas): RanzMarshall
+Selecting heatTransferModel for (gas in liquid): RanzMarshall
+Selecting heatTransferModel for (liquid in gas): spherical
+Selecting saturationModel: function1
+    Adding hRefFluid
+
+    Adding ghRef
+
+    Adding p_rghFluid
+
+    Correcting p_rghFluid
+
+    Correcting initialMassFluid
+
+    Setting reference
+
+*** Reading solid mesh thermophysical properties for region solid
+
+    Adding to thermos
+
+Selecting thermodynamics package 
+{
+    type            heSolidThermo;
+    mixture         pureMixture;
+    transport       constIso;
+    thermo          hConst;
+    equationOfState rhoConst;
+    specie          specie;
+    energy          sensibleEnthalpy;
+}
+
+    Adding to radiations
+
+Selecting radiationModel none
+    Adding fvOptions
+
+Courant Number max: 0.0011475129
+Region: solid Diffusion Number mean: 0.019050785 max: 0.1451621
+surfaceFieldValue inletFluid:
+    operation     = areaAverage
+
+
+surfaceFieldValue outletFluid:
+    operation     = areaAverage
+
+
+surfaceFieldValue interfaceFluid:
+    operation     = areaAverage
+
+
+surfaceFieldValue baseSolid:
+    operation     = areaAverage
+
+
+surfaceFieldValue interfaceSolid:
+    operation     = areaAverage
+
+
+Sampled surface:
+    midplane -> vtk
+        sampledCuttingPlane: midplane : plane:(0 1 0) (0 0 0.005) offsets:(0)
+    crossSection -> vtk
+        sampledCuttingPlane: crossSection : plane:(0 0 1) (0 0 0.0025) offsets:(0)
+    rightSymmetry -> vtk
+        sampledCuttingPlane: rightSymmetry : plane:(1 0 0) (0.00014 0 0) offsets:(0)
+
+exprField ReynoldsLocal:
+    action  = new
+    field   = ReDh
+deltaT = 1e-08
+Courant Number max: 0.0011475129
+Region: solid Diffusion Number mean: 0.019050785 max: 0.1451621
+deltaT = 1.2000005e-08
+Time = 1.20000048e-08
+
+
+Solving for fluid region fluid
+MULES: Solving for alpha.gas
+MULES: Solving for alpha.gas
+MULES: Solving for alpha.gas
+alpha.gas volume fraction = 9.999918e-07  Min(alpha1) = 0  Max(alpha1) = 1e-06
+Constructing face momentum equations
+Tf.gasAndLiquid: min = 338.24113, mean = 338.24113, max = 338.24113
+DILUPBiCGStab:  Solving for h.gas, Initial residual = 1, Final residual = 3.8514582e-06, No Iterations 1
+DILUPBiCGStab:  Solving for h.liquid, Initial residual = 1, Final residual = 1.9742609e-11, No Iterations 1
+Tf.gasAndLiquid: min = 316.86656, mean = 323.72842, max = 323.85625
+DILUPBiCGStab:  Solving for h.gas, Initial residual = 0.98413943, Final residual = 2.3820596e-06, No Iterations 1
+DILUPBiCGStab:  Solving for h.liquid, Initial residual = 0.28643125, Final residual = 4.773656e-12, No Iterations 1
+Tf.gasAndLiquid: min = 311.85171, mean = 317.82525, max = 317.94282
+DILUPBiCGStab:  Solving for h.gas, Initial residual = 0.9653022, Final residual = 1.901805e-06, No Iterations 1
+DILUPBiCGStab:  Solving for h.liquid, Initial residual = 0.14028044, Final residual = 2.2081376e-12, No Iterations 1
+Tf.gasAndLiquid: min = 310.18974, mean = 315.40052, max = 315.50602
+DILUPBiCGStab:  Solving for h.gas, Initial residual = 0.92811877, Final residual = 1.653379e-06, No Iterations 1
+DILUPBiCGStab:  Solving for h.liquid, Initial residual = 0.06269445, Final residual = 9.5708748e-13, No Iterations 1
+GAMG:  Solving for p_rgh, Initial residual = 0.99999795, Final residual = 0.0099622266, No Iterations 64
+GAMG:  Solving for p_rgh, Initial residual = 0.005738817, Final residual = 5.6447412e-05, No Iterations 66
+GAMG:  Solving for p_rgh, Initial residual = 0.12368692, Final residual = 0.0012310662, No Iterations 334
+GAMG:  Solving for p_rgh, Initial residual = 0.00077537913, Final residual = 9.742283e-08, No Iterations 562
+
+Solving for solid region solid
+DICPCG:  Solving for h, Initial residual = 1, Final residual = 9.1346366e-10, No Iterations 3
+Min/max T:300 300.02519
+
+Solving for fluid region fluid
+MULES: Solving for alpha.gas
+MULES: Solving for alpha.gas
+MULES: Solving for alpha.gas
+alpha.gas volume fraction = 9.7333528e-07  Min(alpha1) = 1e-15  Max(alpha1) = 1.0002713e-06
+Constructing face momentum equations
+Tf.gasAndLiquid: min = 309.78253, mean = 314.58177, max = 320.82355
+DILUPBiCGStab:  Solving for h.gas, Initial residual = 0.81485573, Final residual = 1.6651254e-06, No Iterations 1
+DILUPBiCGStab:  Solving for h.liquid, Initial residual = 0.99999996, Final residual = 2.1345143e-11, No Iterations 1
+Tf.gasAndLiquid: min = 309.64492, mean = 314.37567, max = 323.99419
+DILUPBiCGStab:  Solving for h.gas, Initial residual = 0.26827511, Final residual = 5.4107717e-07, No Iterations 1
+DILUPBiCGStab:  Solving for h.liquid, Initial residual = 1.0137596e-09, Final residual = 1.2542574e-19, No Iterations 1
+Tf.gasAndLiquid: min = 309.58606, mean = 314.29321, max = 325.83005
+DILUPBiCGStab:  Solving for h.gas, Initial residual = 0.094679328, Final residual = 1.8969832e-07, No Iterations 1
+DILUPBiCGStab:  Solving for h.liquid, Initial residual = 7.5992731e-11, Final residual = 1.7156271e-21, No Iterations 1
+Tf.gasAndLiquid: min = 309.56337, mean = 314.26064, max = 326.89244
+DILUPBiCGStab:  Solving for h.gas, Initial residual = 0.037318156, Final residual = 7.5353218e-08, No Iterations 1
+DILUPBiCGStab:  Solving for h.liquid, Initial residual = 3.1320422e-11, Final residual = 4.542263e-22, No Iterations 1
+GAMG:  Solving for p_rgh, Initial residual = 0.049358058, Final residual = 0.00048945359, No Iterations 720
+GAMG:  Solving for p_rgh, Initial residual = 0.0002007941, Final residual = 2.0071798e-06, No Iterations 650
+GAMG:  Solving for p_rgh, Initial residual = 0.019950462, Final residual = 0.00023160703, No Iterations 1000

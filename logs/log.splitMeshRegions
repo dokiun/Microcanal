@@ -1,0 +1,92 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2506                                  |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+Build  : _615aae61d7-20250627 OPENFOAM=2506 version=v2506
+Arch   : "LSB;label=32;scalar=64"
+Exec   : splitMeshRegions -cellZonesOnly -overwrite
+Date   : Oct 15 2026
+Time   : 17:30:19
+Host   : unal-master
+PID    : 26815
+I/O    : uncollated
+Case   : /home/jvargasri/refrigeracionMicrocanales/MicrocanalRe800
+nProcs : 1
+trapFpe: Floating point exception trapping enabled (FOAM_SIGFPE).
+fileModificationChecking : Monitoring run-time modified files using timeStampMaster (fileModificationSkew 5, maxFileModificationPolls 20)
+allowSystemOperations : Allowing user-supplied system call operations
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+Create time
+
+Create mesh for time = 0
+
+Creating single patch per inter-region interface.
+
+Using current cellZones to split mesh into regions. This requires all cells to be in one and only one cellZone.
+
+
+Number of regions:2
+
+Writing region per cell file (for manual decomposition) to "/home/jvargasri/refrigeracionMicrocanales/MicrocanalRe800/constant/cellToRegion"
+
+Writing region per cell as volScalarField to "/home/jvargasri/refrigeracionMicrocanales/MicrocanalRe800/0/cellToRegion"
+
+Region	Cells
+------	-----
+0	409600
+1	245760
+
+Region	Zone	Name
+------	----	----
+0	(0)	solid
+1	(1)	fluid
+
+Sizes of interfaces between regions:
+
+Interface	Region	Region	Faces
+---------	------	------	-----
+0		0	1	25600
+
+Reading volScalarField: cellToRegion
+
+
+Adding patches
+
+
+Adding patches
+
+For interface between region solid and fluid added patches
+    6	solid_to_fluid
+    7	fluid_to_solid
+
+Region 0
+-------- 
+Creating mesh for region 0 solid
+Mapping fields
+Mapping field cellToRegion
+Deleting empty patches
+Writing new mesh
+Writing addressing to base mesh
+Writing map pointRegionAddressing from region0 points back to base mesh.
+Writing map faceRegionAddressing from region0 faces back to base mesh.
+Writing map cellRegionAddressing from region0 cells back to base mesh.
+Writing map boundaryRegionAddressing from region0 boundary back to base mesh.
+
+Region 1
+-------- 
+Creating mesh for region 1 fluid
+Mapping fields
+Mapping field cellToRegion
+Deleting empty patches
+Writing new mesh
+Writing addressing to base mesh
+Writing map pointRegionAddressing from region1 points back to base mesh.
+Writing map faceRegionAddressing from region1 faces back to base mesh.
+Writing map cellRegionAddressing from region1 cells back to base mesh.
+Writing map boundaryRegionAddressing from region1 boundary back to base mesh.
+End
+

@@ -1,0 +1,27 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2506                                  |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+Build  : _615aae61d7-20250627 OPENFOAM=2506 version=v2506
+Arch   : "LSB;label=32;scalar=64"
+Exec   : surfaceTransformPoints -read-scale 0.001 geometry/Microcanal.stl constant/triSurface/Microcanal_m.stl
+Date   : Oct 15 2026
+Time   : 17:29:45
+Host   : unal-master
+PID    : 26649
+I/O    : uncollated
+Case   : /home/jvargasri/refrigeracionMicrocanales/MicrocanalRe800
+nProcs : 1
+trapFpe: Floating point exception trapping enabled (FOAM_SIGFPE).
+fileModificationChecking : Monitoring run-time modified files using timeStampMaster (fileModificationSkew 5, maxFileModificationPolls 20)
+allowSystemOperations : Allowing user-supplied system call operations
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+Reading surf from "geometry/Microcanal.stl" ...
+Writing surf to "constant/triSurface/Microcanal_m.stl" ...
+Scaling points uniformly by 0.001
+End
+

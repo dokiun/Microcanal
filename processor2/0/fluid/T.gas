@@ -1,0 +1,64 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2506                                  |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      binary;
+    arch        "LSB;label=32;scalar=64";
+    class       volScalarField;
+    location    "0/fluid";
+    object      T.gas;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 0 0 1 0 0 0];
+
+internalField   uniform 373.15;
+
+boundaryField
+{
+    inlet
+    {
+        type            fixedValue;
+        value           uniform 373.15;
+    }
+    outlet
+    {
+        type            inletOutlet;
+        phi             phi.gas;
+        inletValue      nonuniform List<scalar> 0;
+        value           nonuniform List<scalar> 0;
+    }
+    outerRight
+    {
+        type            symmetryPlane;
+    }
+    outerLeft
+    {
+        type            symmetryPlane;
+    }
+    fluid_to_solid
+    {
+        type            compressible::turbulentTemperatureTwoPhaseRadCoupledMixed;
+        Tnbr            T;
+        kappaMethod     phaseSystem;
+        region          fluid;
+        otherPhase      liquid;
+        qrNbr           none;
+        qr              none;
+        value           uniform 373.15;
+    }
+    procBoundary2to3
+    {
+        type            processor;
+        value           uniform 373.15;
+    }
+}
+
+
+// ************************************************************************* //
