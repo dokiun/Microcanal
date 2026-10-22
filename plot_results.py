@@ -67,19 +67,12 @@ def on_times(series, times, column):
 
 def select_case():
     parser = argparse.ArgumentParser(description="Grafica resultados de una carpeta de caso")
-    parser.add_argument("carpeta", nargs="?", help="Nombre de la carpeta del caso dentro del proyecto")
+    parser.add_argument("carpeta", help="Nombre de la carpeta del caso dentro del proyecto")
     args = parser.parse_args()
-    if args.carpeta:
-        folder = PROJECT / args.carpeta
-        if folder.resolve().parent != PROJECT or not folder.is_dir():
-            parser.error(f"Indica una carpeta existente dentro de {PROJECT}")
-        return folder
-    while True:
-        name = input("Nombre de la carpeta del caso: ").strip()
-        folder = PROJECT / name
-        if name and folder.resolve().parent == PROJECT and folder.is_dir():
-            return folder
-        print(f"No existe esa carpeta dentro de {PROJECT}.")
+    folder = PROJECT / args.carpeta
+    if folder.resolve().parent != PROJECT or not folder.is_dir():
+        parser.error(f"Indica una carpeta existente dentro de {PROJECT}")
+    return folder
 
 
 def load_case_data(root):

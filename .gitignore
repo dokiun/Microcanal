@@ -29,3 +29,5 @@ MicrocanalRe*/*.vtp
 MicrocanalRe*/constant/polyMesh/sets/
 MicrocanalRe*/constant/*/polyMesh/sets/
 MicrocanalRe*/constant/extendedFeatureEdgeMesh/
+
+__pycache__/
