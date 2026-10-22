@@ -93,4 +93,12 @@ python3 MicrocanalRe800V1/scripts/check_euler.py
 
 Después de reconstruir los resultados, abre el archivo `.foam` correspondiente en ParaView.
 
+Para consultar los valores calculados por `dataReduction` en un instante (en milisegundos):
+
+```bash
+python3 propiedades_en_tiempo.py MicrocanalRe100V1 1
+```
+
+El comando muestra los promedios de entrada, salida, interfaces, volumen y base, además de los mínimos y máximos de fase. Interpola entre registros cuando el tiempo solicitado no coincide con uno guardado.
+
 > Nota: las tres carpetas son repositorios Git anidados. Los cambios de cada caso se confirman desde su propia carpeta.
