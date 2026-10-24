@@ -1,0 +1,101 @@
+# Ficha del caso MicrocanalRe100V1
+# Fuentes: archivos de configuración OpenFOAM y logs de este directorio.
+# Los valores son los configurados; Re del nombre es una etiqueta nominal.
+
+[identificacion]
+Nombre_caso             MicrocanalRe100V1
+Re_etiqueta_nominal      100
+Variante                V1
+Solver                  chtMultiRegionTwoPhaseEulerFoam
+OpenFOAM_ejecutado       v2506  # logs/log.blockMesh y logs/log.surfaceCheck
+Regiones                fluid solid
+
+[geometria]
+Fuente_geometria        geometry/Microcanal.stl
+STL_triangulos          44
+STL_escala_a_metros     0.001
+Ejes                    x=transversal, y=vertical, z=flujo
+Dominio_x_m             -0.00015 0.00015
+Dominio_y_m             -0.00020 0.00020
+Dominio_z_m             0 0.005
+Longitud_m              0.005
+Canales                 2 medios canales laterales, una region fluid
+Medio_canal_ancho_m     0.000075
+Canal_completo_ancho_m  0.00015  # por simetria en paredes laterales
+Canal_alto_m            0.00030
+Area_entrada_total_m2   4.50e-8  # dos medios canales de 0.075 x 0.30 mm
+Dh_canal_completo_m     0.00020
+Area_base_caliente_m2   1.50e-6  # 0.30 mm x 5 mm
+Gravedad_m_s2           (0 -9.81 0)
+
+[malla]
+blockMesh_celdas_xyz    (64 64 160)
+blockMesh_celdas        655360
+Malla_final_fluido      645120  # logs/log.checkMesh.fluid
+Malla_final_solido      409600  # logs/log.checkMesh.solid
+Malla_final_total       1054720
+Capas_interfaz_fluida   3  # system/fluid/snappyHexMeshDict
+Primera_capa_m          2e-6
+Refinamiento_fluido_x  factor 2  # system/fluid/refineMeshDict
+Descomposicion          4 subdominios, scotch
+
+[modelos_y_propiedades]
+Fases                   liquid gas
+Modelo_fases            thermalPhaseChangeTwoPhaseSystem
+Cambio_de_fase          off  # constant/fluid/phaseProperties
+Temperatura_saturacion  tabla constant/fluid/Tsat_water.csv
+Tension_superficial_N_m 0.059
+Turbulencia_liquido     laminar
+Liquido_termo           heRhoThermo pureMixture hTabulated icoTabulated
+Liquido_energia         sensibleEnthalpy
+Liquido_rho_kg_m3       997  # tabla 300-373.15 K
+Liquido_Cp_J_kgK        4179  # tabla 300-373.15 K
+Liquido_mu_Pa_s         8.50e-4  # tabla 300-373.15 K
+Liquido_k_W_mK          (300 0.613) (373.15 0.679)
+Gas_termo               heRhoThermo pureMixture hTabulated perfectGas
+Gas_Cp_J_kgK           (373.15 2030) (423.15 2050) (473.15 2100)
+Gas_mu_Pa_s             (373.15 1.22e-5) (423.15 1.35e-5) (473.15 1.48e-5)
+Gas_k_W_mK              (373.15 0.025) (423.15 0.030) (473.15 0.035)
+Gas_Hf_J_kg             2260000
+Solido                  silicio, heSolidThermo, hConst, rhoConst, constIso
+Solido_rho_kg_m3        2329
+Solido_Cp_J_kgK         700
+Solido_k_W_mK           130
+
+[condiciones_iniciales_y_contorno]
+U_liquido_inicial_m_s   (0 0 0.428)
+U_liquido_entrada_tipo  flowRateInletVelocity
+U_liquido_valor_ref_m_s (0 0 0.426)
+Caudal_masico_kg_s      2.57e-5
+Rho_entrada_kg_m3       997
+T_liquido_inicial_K     300
+T_liquido_entrada_K     300
+T_gas_inicial_K         373.15
+T_solido_inicial_K      300
+Alpha_liquido_inicial   0.999999
+Alpha_gas_inicial       1e-6
+Presion_inicial_Pa      101325
+Base_tipo               fixedGradient, patch outerBottom
+Base_gradiente_K_m      7692.307692
+Base_flujo_W_m2         1e+06  # k_solid * gradiente
+Tapa_superior           zeroGradient
+Laterales               symmetryPlane
+Interfaz_termica        compressible::turbulentTemperatureTwoPhaseRadCoupledMixed
+
+[ejecucion_y_salidas]
+Inicio                  latestTime
+Fin_configurado_s       0.1
+Paso_inicial_s          1.00e-8
+Paso_maximo_s           4.00e-6
+Paso_adaptativo         yes
+Co_maximo               0.1999
+AlphaCo_maximo          0.1999
+Escritura               adjustableRunTime, cada 0.01 s, formato binary
+Promedios               system/dataReduction; entrada, salida, base, interfaz, volumen
+ReDh_modo               densidad de campo rho.liquid; se ejecuta al escribir resultados
+ReDh_expresion          rho.liquid*mag(U.liquid)*0.0002/exp(-3.7188 + 578.919/(T.liquid - 137.546))
+ReDh_fuente             system/controlDict
+
+# Nota: esta ficha describe la configuración, no garantiza que la corrida
+# haya alcanzado Fin_configurado_s. Los datos disponibles se consultan en
+# postProcessing/ y los logs de cada caso.

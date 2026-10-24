@@ -1,0 +1,48 @@
+#!/bin/bash
+# Run the existing MC-RC meshes; never rebuild meshes or restore old VoF fields.
+set -eo pipefail
+cd "$(dirname "$0")"
+
+if command -v module >/dev/null 2>&1; then
+    module load openfoam/2506
+fi
+if [[ -n "${WM_PROJECT_DIR:-}" && -f "$WM_PROJECT_DIR/etc/bashrc" ]]; then
+    set +e
+    set +u
+    source "$WM_PROJECT_DIR/etc/bashrc"
+    source_status=$?
+    set -u
+    [[ "$source_status" -eq 0 ]] || echo "Aviso: etc/bashrc terminó con estado $source_status; se validarán los comandos." >&2
+fi
+
+for command_name in chtMultiRegionTwoPhaseEulerFoam checkMesh decomposePar foamDictionary; do
+    command -v "$command_name" >/dev/null 2>&1 || {
+        echo "Error: $command_name no está disponible. Carga OpenFOAM antes de ejecutar Allrun." >&2
+        exit 1
+    }
+done
+mode="${1:-serial}"
+if [[ "$mode" != serial && "$mode" != parallel ]]; then
+    echo 'Usage: bash AllrunCh [serial|parallel]' >&2
+    exit 2
+fi
+mkdir -p logs
+for region in fluid solid; do
+    checkMesh -constant -region "$region" > "logs/log.checkMesh.$region" 2>&1
+    grep -q 'Mesh OK' "logs/log.checkMesh.$region"
+done
+if [[ "$mode" == parallel ]]; then
+    nproc_case=$(foamDictionary system/decomposeParDict -entry numberOfSubdomains -value)
+    for region in fluid solid; do
+        nproc_region=$(foamDictionary "system/$region/decomposeParDict" -entry numberOfSubdomains -value)
+        [[ "$nproc_region" == "$nproc_case" ]] || { echo 'Inconsistent decomposition counts' >&2; exit 1; }
+    done
+    decomposePar -allRegions > logs/log.decomposePar 2>&1
+    if [[ -n "${SLURM_JOB_ID:-}" ]] && command -v srun >/dev/null 2>&1; then
+        srun -n "$nproc_case" chtMultiRegionTwoPhaseEulerFoam -parallel 2>&1 | tee logs/log.chtMultiRegionTwoPhaseEulerFoam
+    else
+        mpirun -np "$nproc_case" chtMultiRegionTwoPhaseEulerFoam -parallel 2>&1 | tee logs/log.chtMultiRegionTwoPhaseEulerFoam
+    fi
+else
+    chtMultiRegionTwoPhaseEulerFoam 2>&1 | tee logs/log.chtMultiRegionTwoPhaseEulerFoam
+fi
