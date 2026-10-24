@@ -1,104 +1,72 @@
-# Simulación térmica de un microcanal
+# Simulación térmica de microcanales
 
-Este proyecto estudia la transferencia de calor conjugada entre un microcanal de silicio y agua líquida, usando OpenFOAM y `chtMultiRegionTwoPhaseEulerFoam`. Se comparan tres condiciones de operación con el mismo dominio y diferentes números de Reynolds de entrada. El transporte multifásico sigue las fases líquida y gaseosa; el cambio de fase está desactivado actualmente.
+Este proyecto contiene seis casos OpenFOAM de transferencia de calor conjugada entre agua y silicio. Se usa `chtMultiRegionTwoPhaseEulerFoam` con las regiones `fluid` y `solid`, tres caudales de entrada y dos variantes por caudal. El sistema incluye las fases `liquid` y `gas`, pero `phaseChange` está **desactivado** en `constant/fluid/phaseProperties`.
 
-## Casos disponibles
+## Casos
 
-| Caso | Reynolds nominal | Velocidad inicial | Caudal másico |
-|---|---:|---:|---:|
-| `MicrocanalRe100V1` | 100 | 0.426 m/s | `2.57 × 10⁻⁵ kg/s` |
-| `MicrocanalRe400V1` | 400 | 1.7090763 m/s | `1.0236 × 10⁻⁴ kg/s` |
-| `MicrocanalRe800V1` | 800 | 3.4181527 m/s | `2.0472 × 10⁻⁴ kg/s` |
+| Reynolds del nombre (nominal) | Variante V1 | Variante V2 | Caudal másico impuesto |
+|---:|---|---|---:|
+| 100 | [`MicrocanalRe100V1`](MicrocanalRe100V1/) | [`MicrocanalRe100V2`](MicrocanalRe100V2/) | 2,57 × 10⁻⁵ kg/s |
+| 400 | [`MicrocanalRe400V1`](MicrocanalRe400V1/) | [`MicrocanalRe400V2`](MicrocanalRe400V2/) | 1,0236 × 10⁻⁴ kg/s |
+| 800 | [`MicrocanalRe800V1`](MicrocanalRe800V1/) | [`MicrocanalRe800V2`](MicrocanalRe800V2/) | 2,0472 × 10⁻⁴ kg/s |
 
-Los valores se definen en `0/fluid/U.liquid`. El campo local `ReDh` se calcula durante la simulación mediante `ReynoldsLocal` en `system/controlDict`.
+El caudal se lee de `0/fluid/U.liquid`. El número de Reynolds del nombre identifica la condición nominal; el Reynolds calculado a partir del caudal puede diferir. Las variantes V1 y V2 comparten geometría, malla y caudal. En `system/controlDict`, V1 calcula `ReDh` con `rho.liquid` al escribir resultados; V2 usa una densidad constante de 997 kg/m³ y lo calcula cada diez pasos. Cada carpeta tiene una ficha `<nombre-del-caso>.dat` con los parámetros de sus archivos y logs.
 
-## Geometría y modelo físico
+## Geometría y física
 
-El dominio representa una sección de silicio con dos medios canales simétricos. Sus dimensiones exteriores son **0.30 × 0.40 × 5 mm** y el diámetro hidráulico es **200 µm**.
+![Geometría tridimensional del microcanal](imgs/Microcanal.png)
 
-![Geometría tridimensional del microcanal](MicrocanalRe100V1/imgs/Microcanal.png)
+![Vista longitudinal del microcanal](imgs/Longitudinal.png)
 
-![Vista longitudinal del microcanal](MicrocanalRe100V1/imgs/Longitudinal.png)
+`geometry/Microcanal.stl` describe una pieza de silicio en I y dos medios canales laterales. La envolvente mide 0,30 × 0,40 × 5 mm. La simetría lateral representa un canal completo de 0,15 × 0,30 mm, con diámetro hidráulico de 200 µm. La malla final tiene 645.120 celdas fluidas y 409.600 sólidas según `logs/log.checkMesh.*`.
 
-Cada caso contiene dos regiones: `fluid` (agua líquida y fase gaseosa) y `solid` (silicio calentado). La geometría cerrada está en `geometry/Microcanal.stl`; la malla se genera con `AllmeshSTL` y la simulación se ejecuta con `Allrun`.
+La entrada del líquido está a 300 K y la presión impuesta en la salida es 101.325 Pa. La base `outerBottom` aplica `fixedGradient` de 7.692,307692 K/m; con la conductividad del sólido de 130 W/(m·K), equivale a un flujo de 10⁶ W/m². Los scripts de ejecución cargan OpenFOAM v2506 y los logs de mallado registran esa versión; algunos encabezados heredados de los diccionarios muestran versiones distintas.
 
-| Parámetro | Valor común |
-|---|---:|
-| Temperatura de entrada | 300 K |
-| Calentamiento de la base | `10⁶ W/m²` |
-| Presión de salida | `101325 Pa` |
-| Longitud | 5 mm |
-| Diámetro hidráulico | 200 µm |
-
-La velocidad se estima con `Re_Dh = ρ U Dh / μ`.
-
-## Estructura
+## Organización
 
 ```text
 Microcanal/
-├── MicrocanalRe100V1/    # Re ≈ 100
-├── MicrocanalRe400V1/    # Re ≈ 400
-├── MicrocanalRe800V1/    # Re ≈ 800
+├── MicrocanalRe100V1/  MicrocanalRe100V2/
+├── MicrocanalRe400V1/  MicrocanalRe400V2/
+├── MicrocanalRe800V1/  MicrocanalRe800V2/
+├── imgs/                # imágenes usadas en este README
+├── scripts/             # análisis y gráficos en Python
+├── plots/               # comparaciones entre casos
 ├── .gitignore
 └── README.md
 ```
 
-Dentro de cada caso: `0/` contiene las condiciones iniciales, `constant/` las propiedades y la malla, `system/` el control numérico, `geometry/` las superficies STL, `AllmeshSTL` genera la malla, `Allrun` ejecuta localmente y `run_hpc.slurm` envía el caso al clúster.
+En cada caso, `0/` contiene los campos iniciales y condiciones de contorno; `constant/`, las propiedades y mallas; `system/`, el control numérico; `geometry/`, el STL; y `logs/`, las comprobaciones y registros de ejecución. Las seis carpetas pertenecen al repositorio Git de esta raíz; no tienen repositorios internos.
 
-## Ejecución local
+## Ejecución
+
+Carga OpenFOAM v2506 y ejecuta desde la raíz del proyecto:
 
 ```bash
-cd MicrocanalRe100V1       # cambiar por Re400V1 o Re800V1
+cd MicrocanalRe100V1   # sustituir por cualquiera de los seis casos
 source /ruta/a/OpenFOAM/etc/bashrc
-bash AllmeshSTL
-bash Allrun
+bash Allrun             # comprueba las mallas existentes y ejecuta el solver
 ```
 
-Para revisar la malla:
+`bash AllmeshSTL` vuelve a generar la malla desde el STL; úsalo cuando necesites reconstruirla. Para comprobar la malla existente sin iniciar la simulación:
 
 ```bash
 checkMesh -constant -region fluid
 checkMesh -constant -region solid
 ```
 
-Para paralelizar manualmente:
+## Análisis de resultados
+
+Ejecuta estos comandos desde la raíz del proyecto. Requieren Python 3, NumPy y Matplotlib; los gráficos que leen la simulación requieren datos en `postProcessing/`.
 
 ```bash
-decomposePar -allRegions -force
-mpirun -np 4 chtMultiRegionTwoPhaseEulerFoam -parallel
-reconstructPar -allRegions
+python3 -m scripts.plot_results MicrocanalRe100V1
+python3 -m scripts.propiedades_en_tiempo MicrocanalRe100V1 1  # tiempo en ms
+python3 -m scripts.compare_cases MicrocanalRe100V1 MicrocanalRe400V1 MicrocanalRe800V1
+python3 -m scripts.compare_friction MicrocanalRe100V1 MicrocanalRe400V1 MicrocanalRe800V1
+python3 -m scripts.plot_nux MicrocanalRe100V1 MicrocanalRe400V1 MicrocanalRe800V1 --re nominal
 ```
 
-## Ejecución en el clúster
+`plot_results` guarda una gráfica en `plots/` dentro del caso. Las comparaciones guardan sus figuras en `plots/` de la raíz. `plot_nux` calcula la correlación longitudinal de Nusselt y exporta CSV; permite `--re calculado` para usar el Reynolds obtenido del caudal. Los gráficos temporales usan solo el intervalo cubierto por todas las series necesarias y no extrapolan registros faltantes.
 
-```bash
-sbatch MicrocanalRe100V1/run_hpc.slurm
-sbatch MicrocanalRe400V1/run_hpc.slurm
-sbatch MicrocanalRe800V1/run_hpc.slurm
-```
-
-Cada script solicita un nodo, cuatro tareas, 32 GB de memoria y hasta 48 horas. Verifica que el `cd` del script coincida con el nombre real de la carpeta.
-
-## Resultados
-
-Se comparan la caída de presión, temperaturas de base/pared/fluido, velocidad, presión, fracción de vapor, `ReDh`, convergencia y calidad de malla. Los resultados se guardan en `postProcessing/`, los logs en `logs/` y la paralelización en `processor*/`; estos artefactos están excluidos por el `.gitignore` común.
-
-Para ejecutar las verificaciones:
-
-```bash
-python3 MicrocanalRe100V1/scripts/check_euler.py
-python3 MicrocanalRe400V1/scripts/check_euler.py
-python3 MicrocanalRe800V1/scripts/check_euler.py
-```
-
-Después de reconstruir los resultados, abre el archivo `.foam` correspondiente en ParaView.
-
-Para consultar los valores calculados por `dataReduction` en un instante (en milisegundos):
-
-```bash
-python3 propiedades_en_tiempo.py MicrocanalRe100V1 1
-```
-
-El comando muestra los promedios de entrada, salida, interfaces, volumen y base, además de los mínimos y máximos de fase. Interpola entre registros cuando el tiempo solicitado no coincide con uno guardado.
-
-> Nota: las tres carpetas son repositorios Git anidados. Los cambios de cada caso se confirman desde su propia carpeta.
+Los archivos `.foam` de cada carpeta se pueden abrir en ParaView. `postProcessing/`, `processor*/`, logs y archivos `.foam` generados están excluidos por el `.gitignore` de la raíz.

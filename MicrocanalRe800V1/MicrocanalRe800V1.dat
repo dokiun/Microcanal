@@ -26,6 +26,10 @@ Canal_alto_m            0.00030
 Area_entrada_total_m2   4.50e-8  # dos medios canales de 0.075 x 0.30 mm
 Dh_canal_completo_m     0.00020
 Area_base_caliente_m2   1.50e-6  # 0.30 mm x 5 mm
+# Alias geométricos usados por scripts/plot_nux.py y scripts/compare_friction.py.
+L_total                 0.005         m
+A_seccion_transversal   4.50e-8       m2
+Dh_hidraulico           0.00020       m
 Gravedad_m_s2           (0 -9.81 0)
 
 [malla]

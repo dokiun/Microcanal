@@ -14,7 +14,7 @@ import numpy as np
 os.environ.setdefault("MPLCONFIGDIR", "/tmp/matplotlib-cache")
 import matplotlib.pyplot as plt
 
-PROJECT = Path(__file__).resolve().parent
+PROJECT = Path(__file__).resolve().parents[1]
 DH = 200e-6  # m; sección nominal de canal 0.15 x 0.30 mm
 
 

@@ -13,10 +13,10 @@ from scripts.plot_results import foam_value, read_series
 
 
 def parameter(root, key):
-    files = list(root.glob("*parametros.dat"))
-    if len(files) != 1:
-        raise ValueError(f"Se esperaba un archivo *parametros.dat en {root}")
-    return foam_value(files[0], rf"(?m)^\s*{re.escape(key)}\s+([\d.eE+-]+)\b", key)
+    path = root / f"{root.name}.dat"
+    if not path.is_file():
+        raise FileNotFoundError(f"No se encontró {path}")
+    return foam_value(path, rf"(?m)^\s*{re.escape(key)}\s+([\d.eE+-]+)\b", key)
 
 
 def property_at_300(root, key):

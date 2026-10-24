@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=microchannelRe800
+#SBATCH --job-name=MicrocanalRe800V1
 #SBATCH --partition=hpc-long
 #SBATCH --time=48:00:00
 #SBATCH --nodes=1
@@ -11,7 +11,7 @@
 
 set -eo pipefail
 
-cd "${SLURM_SUBMIT_DIR}/MicrocanalRe800"
+cd "${SLURM_SUBMIT_DIR}/MicrocanalRe800V1"
 module load openfoam/2506
 set +e
 set +u
