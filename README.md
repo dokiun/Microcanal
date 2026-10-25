@@ -70,3 +70,49 @@ python3 -m scripts.plot_nux MicrocanalRe100V1 MicrocanalRe400V1 MicrocanalRe800V
 `plot_results` guarda una gráfica en `plots/` dentro del caso. Las comparaciones guardan sus figuras en `plots/` de la raíz. `plot_nux` calcula la correlación longitudinal de Nusselt y exporta CSV; permite `--re calculado` para usar el Reynolds obtenido del caudal. Los gráficos temporales usan solo el intervalo cubierto por todas las series necesarias y no extrapolan registros faltantes.
 
 Los archivos `.foam` de cada carpeta se pueden abrir en ParaView. `postProcessing/`, `processor*/`, logs y archivos `.foam` generados están excluidos por el `.gitignore` de la raíz.
+
+# Cálculo de `NuLocal`
+
+El número de Nusselt local se calcula a lo largo del canal, cuya dirección
+principal es `z`, mediante:
+
+```text
+NuLocal(z) = q''w(z) * Dh / [kl(Tb(z)) * (Tw(z) - Tb(z))]
+```
+
+donde:
+
+- `Dh = 0.0002 m` es el diámetro hidráulico.
+- `q''w(z)` es el flujo de calor local en la interfaz `fluid_to_solid`.
+- `Tw(z)` es la temperatura local de pared inferior obtenida en `fluid_to_solid`.
+- `Tb(z)` se define aquí como la temperatura `T.liquid` sobre la línea central
+  del fluido, `(x,y) = (0,0)`, en distintas posiciones `z`.
+- `kl(Tb)` es la conductividad térmica del líquido evaluada a la temperatura
+  central.
+
+El coeficiente local de transferencia se obtiene de:
+
+```text
+hLocal(z) = q''w(z) / [Tw(z) - Tb(z)]
+```
+
+y luego:
+
+```text
+NuLocal(z) = hLocal(z) * Dh / kl(Tb(z))
+```
+
+Los probes centrales, la temperatura de pared y el flujo de calor se muestrean
+con la frecuencia configurada para las capturas VTK. El resultado debe
+construirse emparejando cada posición axial `z` y cada tiempo de muestreo.
+
+El cálculo se ejecuta desde la raíz con:
+
+```bash
+python3 calculate_nulocal.py
+```
+
+El script escribe `postProcessing/NuLocal/<caso>/NuLocal.dat`. Requiere que
+las salidas de `centerlineTb`, `wallTemperatureFluid` y `wallHeatFluxFluid`
+ya existan y que las dos salidas de pared incluyan la coordenada axial `z`.
+

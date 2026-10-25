@@ -74,7 +74,7 @@ def main() -> None:
     diametro = pedir_numero(f"Diámetro hidráulico ({nombre_d})") * factor_d
 
     nombre_mu, factor_mu = elegir_unidad("viscosidad dinámica", UNIDADES_VISCOSIDAD)
-    viscosidad = pedir_numero(f"Viscosidad dinámica ({nombre_mu})", 1.002) * factor_mu
+    viscosidad = pedir_numero(f"Viscosidad dinámica ({nombre_mu})", 0.853) * factor_mu
     densidad = pedir_numero("Densidad del agua (kg/m³)", 998.2)
 
     velocidad = reynolds * viscosidad / (densidad * diametro)
