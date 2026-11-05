@@ -1,0 +1,3 @@
+# Wall heat-flux
+# Time          	patch           	min             	max             	integral        
+5.999808006e-07 	solid_to_fluid	-3.38623887e-04	-2.03492175e-05	-2.04151095e-10

@@ -8,10 +8,16 @@ import os
 os.environ.setdefault("MPLCONFIGDIR", "/tmp/matplotlib-cache")
 import matplotlib.pyplot as plt
 
-from scripts.plot_results import PROJECT, load_case_data
+if __package__:
+    from .plot_results import PROJECT, load_case_data
+else:
+    from plot_results import PROJECT, load_case_data
 
 
 PLOTS = PROJECT / "plots"
+THERMAL_START_MS = 10.0  # Excluye el pico artificial cuando Tpared ≈ Tfluido.
+PRESSURE_START_MS = 0.1
+PRESSURE_END_MS = 1.0  # La caída de presión se estabiliza mucho antes que h.
 METRICS = (
     ("temperatura_base", "t_base_k", "Temperatura de la base", "Temperatura [°C]", lambda values: values - 273.15),
     ("temperatura_pared", "t_wall_k", "Temperatura de la pared", "Temperatura [°C]", lambda values: values - 273.15),
@@ -29,10 +35,10 @@ def case_folder(name):
     return folder
 
 
-def select_cases():
+def select_cases(args=None):
     parser = argparse.ArgumentParser(description="Compara dos o más carpetas de casos")
     parser.add_argument("carpetas", nargs="*", help="Nombres de carpetas dentro del proyecto")
-    names = parser.parse_args().carpetas
+    names = parser.parse_args(args).carpetas
     if names:
         if len(names) < 2:
             parser.error("Indica al menos dos carpetas")
@@ -83,8 +89,26 @@ def main():
     for filename, key, title, ylabel, convert in METRICS:
         fig, ax = plt.subplots(figsize=(10, 6), dpi=200)
         for index, case in enumerate(data):
-            ax.plot(case["time_ms"], convert(case[key]), label=case["name"], color=colors(index), linewidth=1.8)
-        ax.set_title(title)
+            times = case["time_ms"]
+            values = convert(case[key])
+            if key == "delta_p_pa":
+                mask = (times >= PRESSURE_START_MS) & (times <= PRESSURE_END_MS)
+                if not mask.any():
+                    raise SystemExit(f"{case['name']} no tiene datos de presión entre "
+                                     f"{PRESSURE_START_MS:g} y {PRESSURE_END_MS:g} ms")
+                times, values = times[mask], values[mask]
+            elif key in ("h", "nu"):
+                mask = times >= THERMAL_START_MS
+                if not mask.any():
+                    raise SystemExit(f"{case['name']} no tiene datos de {key} desde {THERMAL_START_MS:g} ms")
+                times, values = times[mask], values[mask]
+            ax.plot(times, values, label=case["name"], color=colors(index), linewidth=1.8)
+        if key == "delta_p_pa":
+            ax.set_title(f"{title} ({PRESSURE_START_MS:g}–{PRESSURE_END_MS:g} ms)")
+        elif key in ("h", "nu"):
+            ax.set_title(f"{title} (desde {THERMAL_START_MS:g} ms)")
+        else:
+            ax.set_title(title)
         ax.set_xlabel("Tiempo [ms]")
         ax.set_ylabel(ylabel)
         ax.legend(title="Caso", loc="best")

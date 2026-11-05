@@ -1,0 +1,49 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  plus                                  |
+|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     chtMultiRegionFoam;
+startFrom       startTime;
+startTime       0;
+stopAt          endTime;
+endTime         0.1;
+deltaT          8.00e-8;
+writeControl    adjustableRunTime;
+writeInterval   0.0136363636364;
+purgeWrite      0;
+writeFormat     binary;
+writePrecision  8;
+writeCompression off;
+timeFormat      general;
+timePrecision   10;
+runTimeModifiable yes;
+adjustTimeStep  yes;
+maxCo           0.1999;
+maxAlphaCo      0.1999;
+maxDi           100;
+maxCapillaryNum 1;
+
+libs
+(
+);
+
+functions
+{
+    #include "dataReduction"
+    #include "cuttingPlanes"
+    #include "nuSampling"
+
+}

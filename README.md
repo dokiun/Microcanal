@@ -83,7 +83,8 @@ NuLocal(z) = q''w(z) * Dh / [kl(Tb(z)) * (Tw(z) - Tb(z))]
 donde:
 
 - `Dh = 0.0002 m` es el diámetro hidráulico.
-- `q''w(z)` es el flujo de calor local en la interfaz `fluid_to_solid`.
+- `q''w(z)` se aproxima como uniforme: el flujo integral de `wallHeatFluxFluid`
+  dividido por el área de `interfaceSolid` en cada instante.
 - `Tw(z)` es la temperatura local de pared inferior obtenida en `fluid_to_solid`.
 - `Tb(z)` se define aquí como la temperatura `T.liquid` sobre la línea central
   del fluido, `(x,y) = (0,0)`, en distintas posiciones `z`.
@@ -102,17 +103,17 @@ y luego:
 NuLocal(z) = hLocal(z) * Dh / kl(Tb(z))
 ```
 
-Los probes centrales, la temperatura de pared y el flujo de calor se muestrean
-con la frecuencia configurada para las capturas VTK. El resultado debe
-construirse emparejando cada posición axial `z` y cada tiempo de muestreo.
+Los probes centrales y de pared se emparejan por tiempo y posición axial.
+El flujo integral se interpola al tiempo de cada perfil de temperatura.
 
 El cálculo se ejecuta desde la raíz con:
 
 ```bash
-python3 calculate_nulocal.py
+python3 scripts/calculate_nulocal.py
 ```
 
-El script escribe `postProcessing/NuLocal/<caso>/NuLocal.dat`. Requiere que
-las salidas de `centerlineTb`, `wallTemperatureFluid` y `wallHeatFluxFluid`
-ya existan y que las dos salidas de pared incluyan la coordenada axial `z`.
+El script procesa los tres casos V3 por defecto y guarda `NuLocal.dat` y
+`NuLocal.png` en `plots/` de cada caso. La figura muestra el perfil del último
+instante disponible. Requiere las salidas de `centerlineTb`, `wallTemperatureFluid` y
+`wallHeatFluxFluid`.
 

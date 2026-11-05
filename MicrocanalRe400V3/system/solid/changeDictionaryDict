@@ -1,0 +1,43 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2406                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system/solid";
+    object      changeDictionaryDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dictionaryReplacement
+{
+    boundary
+    {
+        outerLeft
+        {
+            type symmetryPlane;
+            inGroups 1 (symmetryPlane);
+        }
+        outerRight
+        {
+            type symmetryPlane;
+            inGroups 1 (symmetryPlane);
+        }
+        solid_to_fluid
+        {
+            type            mappedWall;
+            inGroups        1 ( wall );
+            sampleMode      nearestPatchFace;
+            sampleRegion    fluid;
+            samplePatch     fluid_to_solid;
+        }
+    }
+}
+
+// ************************************************************************* //

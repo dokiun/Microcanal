@@ -16,6 +16,9 @@ import matplotlib.pyplot as plt
 
 PROJECT = Path(__file__).resolve().parents[1]
 DH = 200e-6  # m; sección nominal de canal 0.15 x 0.30 mm
+PRESSURE_START_MS = 0.1
+PRESSURE_END_MS = 1.0
+THERMAL_START_MS = 10.0
 
 
 def foam_value(path, pattern, label):
@@ -26,15 +29,43 @@ def foam_value(path, pattern, label):
     return float(match.group(1))
 
 
+def first_existing(paths, label):
+    for path in paths:
+        if path.is_file():
+            return path
+    names = ", ".join(str(path) for path in paths)
+    raise FileNotFoundError(f"No se encontró {label}; se buscó en: {names}")
+
+
 def case_parameters(root):
-    mdot = foam_value(root / "0/fluid/U.liquid", r"massFlowRate\s+constant\s+([\d.eE+-]+)\s*;", "massFlowRate")
-    liquid = root / "constant/fluid/thermophysicalProperties.liquid"
-    conductivity = re.search(r"\bkappa\s*\((.*?)\)\s*;", re.sub(r"//[^\n]*", "", liquid.read_text()), re.S)
-    if not conductivity:
-        raise ValueError(f"No se encontró la tabla kappa en {liquid}")
-    pairs = np.array([(float(t), float(k)) for t, k in re.findall(r"\(\s*([\d.eE+-]+)\s+([\d.eE+-]+)\s*\)", conductivity.group(1))])
+    velocity = first_existing(
+        [root / "0/fluid/U.liquid", root / "0/fluid/U"],
+        "el campo de velocidad inicial",
+    )
+    mdot = foam_value(velocity, r"massFlowRate\s+constant\s+([\d.eE+-]+)\s*;", "massFlowRate")
+    liquid = first_existing(
+        [
+            root / "constant/fluid/thermophysicalProperties.liquid",
+            root / "constant/fluid/thermophysicalProperties",
+        ],
+        "las propiedades termofísicas del fluido",
+    )
+    liquid_content = re.sub(r"//[^\n]*", "", liquid.read_text())
+    conductivity = re.search(r"\bkappa\s*\((.*?)\)\s*;", liquid_content, re.S)
+    if conductivity:
+        pairs = np.array([
+            (float(t), float(k))
+            for t, k in re.findall(
+                r"\(\s*([\d.eE+-]+)\s+([\d.eE+-]+)\s*\)", conductivity.group(1)
+            )
+        ])
+    else:
+        cp = foam_value(liquid, r"\bCp\s+([\d.eE+-]+)\s*;", "Cp")
+        mu = foam_value(liquid, r"\bmu\s+([\d.eE+-]+)\s*;", "mu")
+        pr = foam_value(liquid, r"\bPr\s+([\d.eE+-]+)\s*;", "Pr")
+        pairs = np.array([[300.0, mu * cp / pr], [373.15, mu * cp / pr]])
     if len(pairs) < 2:
-        raise ValueError(f"Tabla kappa inválida en {liquid}")
+        raise ValueError(f"Propiedades de conductividad inválidas en {liquid}")
     gradient = foam_value(root / "0/solid/T", r"outerBottom\s*\{.*?gradient\s+uniform\s+([\d.eE+-]+)\s*;", "gradient de outerBottom")
     solid_k = foam_value(root / "constant/solid/thermophysicalProperties", r"\bkappa\s+([\d.eE+-]+)\s*;", "kappa del sólido")
     return mdot, pairs, abs(gradient * solid_k)
@@ -43,19 +74,33 @@ def case_parameters(root):
 def read_series(root, region, name):
     folder = root / "postProcessing" / region / name
     files = sorted(folder.glob("*/*.dat"))
-    rows = {}
+    segments = []
     area = None
     for path in files:
+        rows = {}
         for line in path.read_text().splitlines():
             if line.startswith("# Area"):
                 area = float(line.split(":", 1)[1])
             elif line and not line.startswith("#"):
                 values = [float(x) for x in line.replace("(", " ").replace(")", " ").split()]
                 rows[values[0]] = values[1:]
+        if rows:
+            segments.append((max(rows), rows))
+    # Los archivos de una corrida reiniciada pueden cubrir los mismos tiempos.
+    # Conserva la serie que llega más lejos en el intervalo superpuesto.
+    rows = {}
+    for _, segment in sorted(segments, key=lambda item: item[0]):
+        start, end = min(segment), max(segment)
+        rows = {time: values for time, values in rows.items() if not start <= time <= end}
+        rows.update(segment)
     if not rows:
         raise FileNotFoundError(f"Sin datos para {region}/{name} en {folder}")
     times = np.array(sorted(rows))
-    return times, np.array([rows[t] for t in times]), area
+    width = max(len(values) for values in rows.values())
+    values = np.full((len(times), width), np.nan)
+    for index, time in enumerate(times):
+        values[index, :len(rows[time])] = rows[time]
+    return times, values, area
 
 
 def on_times(series, times, column):
@@ -165,19 +210,25 @@ def main():
     ax.legend()
 
     ax = axes[0, 1]
-    ax.plot(t_ms, delta_p / 1000, color="#059669")
+    pressure_mask = (t_ms >= PRESSURE_START_MS) & (t_ms <= PRESSURE_END_MS)
+    if not pressure_mask.any():
+        raise ValueError(f"Sin datos de presión entre {PRESSURE_START_MS:g} y {PRESSURE_END_MS:g} ms")
+    ax.plot(t_ms[pressure_mask], delta_p[pressure_mask] / 1000, color="#059669")
     ax.set_ylabel("Caída de presión [kPa]")
-    ax.set_title("Caída de presión")
+    ax.set_title(f"Caída de presión ({PRESSURE_START_MS:g}–{PRESSURE_END_MS:g} ms)")
 
+    thermal_mask = t_ms >= THERMAL_START_MS
+    if not thermal_mask.any():
+        raise ValueError(f"Sin datos térmicos desde {THERMAL_START_MS:g} ms")
     ax = axes[1, 0]
-    ax.plot(t_ms, h, color="#ea580c")
+    ax.plot(t_ms[thermal_mask], h[thermal_mask], color="#ea580c")
     ax.set_ylabel("h [W/(m² K)]")
-    ax.set_title("Coeficiente convectivo")
+    ax.set_title(f"Coeficiente convectivo (desde {THERMAL_START_MS:g} ms)")
 
     ax = axes[1, 1]
-    ax.plot(t_ms, nu, color="#2563eb")
+    ax.plot(t_ms[thermal_mask], nu[thermal_mask], color="#2563eb")
     ax.set_ylabel("Nu [–]")
-    ax.set_title("Número de Nusselt")
+    ax.set_title(f"Número de Nusselt (desde {THERMAL_START_MS:g} ms)")
 
     for ax in axes.flat:
         ax.set_xlabel("Tiempo [ms]")
