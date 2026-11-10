@@ -1,0 +1,55 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2412                                  |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+Build  : _b8cf4d35-20260127 OPENFOAM=2412 patch=260127 version=2412
+Arch   : "LSB;label=32;scalar=64"
+Exec   : topoSet
+Date   : Nov 09 2026
+Time   : 22:27:29
+Host   : ThinkPad-T490
+PID    : 20960
+I/O    : uncollated
+Case   : /home/gabs/Documentos/twoPhaseFlow_Copy/Cambios/NUEVO
+nProcs : 1
+trapFpe: Floating point exception trapping enabled (FOAM_SIGFPE).
+fileModificationChecking : Monitoring run-time modified files using timeStampMaster (fileModificationSkew 5, maxFileModificationPolls 20)
+allowSystemOperations : Allowing user-supplied system call operations
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+Create time
+
+--> FOAM Warning : 
+    From void* Foam::dlLibraryTable::openLibrary(const Foam::fileName&, bool)
+    in file db/dynamicLibrary/dlLibraryTable/dlLibraryTable.C at line 188
+    Could not load "libpostProcess.so"
+libpostProcess.so: cannot open shared object file: No such file or directory
+--> FOAM Warning : 
+    From void* Foam::dlLibraryTable::openLibrary(const Foam::fileName&, bool)
+    in file db/dynamicLibrary/dlLibraryTable/dlLibraryTable.C at line 188
+    Could not load "libfluidThermo.so"
+libfluidThermo.so: cannot open shared object file: No such file or directory
+Create polyMesh for time = 0
+
+Reading topoSetDict
+
+Time = 0
+    mesh not changed.
+Created cellSet fluidCells
+    Applying source zoneToCell
+    Adding all cells of cell zones: (solid) ...
+    Using zone solid with 409600 cells
+    cellSet fluidCells now size 409600
+Read set cellSet fluidCells size:409600
+    Inverting cellSet
+    cellSet fluidCells now size 245760
+Created cellZoneSet fluid
+    Applying source setToCellZone
+    Adding all cells from cell set: fluidCells ...
+    cellZoneSet fluid now size 245760
+
+End
+

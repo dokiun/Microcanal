@@ -1,0 +1,102 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2412                                  |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+Build  : _b8cf4d35-20260127 OPENFOAM=2412 patch=260127 version=2412
+Arch   : "LSB;label=32;scalar=64"
+Exec   : splitMeshRegions -cellZonesOnly -overwrite
+Date   : Nov 09 2026
+Time   : 22:27:33
+Host   : ThinkPad-T490
+PID    : 20968
+I/O    : uncollated
+Case   : /home/gabs/Documentos/twoPhaseFlow_Copy/Cambios/NUEVO
+nProcs : 1
+trapFpe: Floating point exception trapping enabled (FOAM_SIGFPE).
+fileModificationChecking : Monitoring run-time modified files using timeStampMaster (fileModificationSkew 5, maxFileModificationPolls 20)
+allowSystemOperations : Allowing user-supplied system call operations
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+Create time
+
+--> FOAM Warning : 
+    From void* Foam::dlLibraryTable::openLibrary(const Foam::fileName&, bool)
+    in file db/dynamicLibrary/dlLibraryTable/dlLibraryTable.C at line 188
+    Could not load "libpostProcess.so"
+libpostProcess.so: cannot open shared object file: No such file or directory
+--> FOAM Warning : 
+    From void* Foam::dlLibraryTable::openLibrary(const Foam::fileName&, bool)
+    in file db/dynamicLibrary/dlLibraryTable/dlLibraryTable.C at line 188
+    Could not load "libfluidThermo.so"
+libfluidThermo.so: cannot open shared object file: No such file or directory
+Create mesh for time = 0
+
+Creating single patch per inter-region interface.
+
+Using current cellZones to split mesh into regions. This requires all cells to be in one and only one cellZone.
+
+
+Number of regions:2
+
+Writing region per cell file (for manual decomposition) to "/home/gabs/Documentos/twoPhaseFlow_Copy/Cambios/NUEVO/constant/cellToRegion"
+
+Writing region per cell as volScalarField to "/home/gabs/Documentos/twoPhaseFlow_Copy/Cambios/NUEVO/0/cellToRegion"
+
+Region	Cells
+------	-----
+0	409600
+1	245760
+
+Region	Zone	Name
+------	----	----
+0	(0)	solid
+1	(1)	fluid
+
+Sizes of interfaces between regions:
+
+Interface	Region	Region	Faces
+---------	------	------	-----
+0		0	1	25600
+
+Reading volScalarField: cellToRegion
+
+
+Adding patches
+
+
+Adding patches
+
+For interface between region solid and fluid added patches
+    6	solid_to_fluid
+    7	fluid_to_solid
+
+Region 0
+-------- 
+Creating mesh for region 0 solid
+Mapping fields
+Mapping field cellToRegion
+Deleting empty patches
+Writing new mesh
+Writing addressing to base mesh
+Writing map pointRegionAddressing from region0 points back to base mesh.
+Writing map faceRegionAddressing from region0 faces back to base mesh.
+Writing map cellRegionAddressing from region0 cells back to base mesh.
+Writing map boundaryRegionAddressing from region0 boundary back to base mesh.
+
+Region 1
+-------- 
+Creating mesh for region 1 fluid
+Mapping fields
+Mapping field cellToRegion
+Deleting empty patches
+Writing new mesh
+Writing addressing to base mesh
+Writing map pointRegionAddressing from region1 points back to base mesh.
+Writing map faceRegionAddressing from region1 faces back to base mesh.
+Writing map cellRegionAddressing from region1 cells back to base mesh.
+Writing map boundaryRegionAddressing from region1 boundary back to base mesh.
+End
+

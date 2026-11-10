@@ -1,0 +1,27 @@
+#!/bin/bash
+# Limpia solo los artefactos de la malla generada en el caso NUEVO.
+# Conserva la geometría, los diccionarios y los campos físicos.
+
+set -euo pipefail
+cd "$(dirname "$0")" || exit 1
+
+echo "Borrando la malla generada del caso NUEVO..."
+
+# Malla base y regionales
+rm -rf constant/polyMesh 2>/dev/null || true
+rm -rf constant/fluid/polyMesh 2>/dev/null || true
+rm -rf constant/solid/polyMesh 2>/dev/null || true
+rm -rf constant/cellToRegion 2>/dev/null || true
+
+# Archivos intermedios de OpenFOAM
+rm -rf processor* 2>/dev/null || true
+rm -rf postProcessing 2>/dev/null || true
+rm -rf logs 2>/dev/null || true
+rm -rf log.* 2>/dev/null || true
+rm -f *.foam 2>/dev/null || true
+
+# Directorios temporales numéricos de ejecución
+find . -maxdepth 1 -type d \( -name '[1-9]*' -o -name '0.[0-9]*' -o -name 'processor*' \) -exec rm -rf {} + 2>/dev/null || true
+
+echo "Malla limpia. Se conservan: geometry/, system/, constant/triSurface/, 0/ y los diccionarios del caso."
+echo "Para regenerarla, ejecuta: bash AllmeshSTL"

@@ -1,0 +1,44 @@
+#!/bin/bash
+# Allclean para NUEVO
+# Conserva la malla ya generada y los archivos 0/ del caso base físico de TwoPhasesFlow_G,
+# pero elimina resultados temporales y salidas intermedias del cálculo.
+
+set -euo pipefail
+cd "$(dirname "$0")" || exit 1
+
+# Cargar entorno OpenFOAM si está disponible
+if [ -n "${WM_PROJECT_DIR:-}" ] && [ -f "$WM_PROJECT_DIR/bin/tools/CleanFunctions" ]; then
+    # shellcheck source=/dev/null
+    . "$WM_PROJECT_DIR/bin/tools/CleanFunctions"
+fi
+
+# Eliminar directorios temporales de ejecución (0.xxx, processor*, etc.)
+if command -v cleanTimeDirectories >/dev/null 2>&1; then
+    cleanTimeDirectories
+else
+    find . -maxdepth 1 -type d \( -name '[1-9]*' -o -name '0.[0-9]*' -o -name 'processor*' \) -exec rm -rf {} + 2>/dev/null || true
+fi
+
+# Eliminar resultados de post-proceso y directorios generados
+if command -v cleanPostProcessing >/dev/null 2>&1; then
+    cleanPostProcessing
+else
+    rm -rf postProcessing 2>/dev/null || true
+fi
+
+rm -rf processor* 2>/dev/null || true
+rm -rf log.* 2>/dev/null || true
+rm -rf logs 2>/dev/null || true
+rm -rf *.foam 2>/dev/null || true
+
+# Mantener los archivos base del caso:
+# - 0/
+# - constant/
+# - system/
+# - geometry/
+# - malla ya generada en constant/*/polyMesh
+#
+# Si se quiere un caso completamente limpio para nueva ejecución, se puede regenerar la malla
+# con AllmeshSTL y volver a crear el entorno con el comando correspondiente.
+
+echo "Caso NUEVO limpio. Se conservaron 0/, constant/, system/, geometry/ y la malla importada."

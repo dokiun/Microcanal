@@ -1,0 +1,194 @@
+// ============================================================================
+// FUNCIONES DE POSTPROCESO - NUEVO
+// Malla actual: MicrocanalRe100V2
+// Nombres de patch ajustados a la malla generada en esta carpeta.
+// Solo quedan las funciones necesarias para monitorizar flujo, calor y salida.
+// ============================================================================
+
+__globalTpl
+{
+    libs            (fieldFunctionObjects);
+    writeControl    runTime;
+    writeInterval   0.0005;
+    log             false;
+    writeFields     false;
+}
+
+// ============================================================================
+// 1. RESIDUOS
+// ============================================================================
+
+residualsFluid
+{
+    type            solverInfo;
+    libs            (utilityFunctionObjects);
+    region          fluid;
+    fields          (U p_rgh h);
+    writeResidualFields no;
+}
+
+residualsSolid
+{
+    type            solverInfo;
+    libs            (utilityFunctionObjects);
+    region          solid;
+    fields          (h);
+    writeResidualFields no;
+}
+
+// ============================================================================
+// 2. PRESIONES
+// ============================================================================
+
+pInlet
+{
+    type            surfaceFieldValue;
+    libs            (fieldFunctionObjects);
+    writeControl    runTime;
+    writeInterval   0.0005;
+    region          fluid;
+    regionType      patch;
+    name            inlet;
+    operation       areaAverage;
+    fields          (p);
+}
+
+pOutlet
+{
+    type            surfaceFieldValue;
+    libs            (fieldFunctionObjects);
+    writeControl    runTime;
+    writeInterval   0.0005;
+    region          fluid;
+    regionType      patch;
+    name            outlet;
+    operation       areaAverage;
+    fields          (p);
+}
+
+// ============================================================================
+// 3. CAUDAL VOLUMETRICO (phi)
+// ============================================================================
+
+phiInlet
+{
+    type            surfaceFieldValue;
+    libs            (fieldFunctionObjects);
+    writeControl    runTime;
+    writeInterval   0.0005;
+    region          fluid;
+    regionType      patch;
+    name            inlet;
+    operation       sum;
+    fields          (phi);
+}
+
+// ============================================================================
+// 4. TEMPERATURA DE SALIDA
+// ============================================================================
+
+TbulkOutlet
+{
+    type            surfaceFieldValue;
+    libs            (fieldFunctionObjects);
+    writeControl    runTime;
+    writeInterval   0.0005;
+    region          fluid;
+    regionType      patch;
+    name            outlet;
+    operation       weightedAverage;
+    weightField     phi;
+    fields          (T);
+}
+
+// ============================================================================
+// 5. TEMPERATURA DE LA INTERFAZ FLUIDO-SOLIDO
+// ============================================================================
+
+TwallInterface
+{
+    type            surfaceFieldValue;
+    libs            (fieldFunctionObjects);
+    writeControl    runTime;
+    writeInterval   0.0005;
+    region          fluid;
+    regionType      patch;
+    name            fluid_to_solid;
+    operation       areaAverage;
+    fields          (T);
+}
+
+// ============================================================================
+// 6. TEMPERATURA DE LA SUPERFICIE CALEFACTORA
+// ============================================================================
+
+TbaseAverage
+{
+    type            surfaceFieldValue;
+    libs            (fieldFunctionObjects);
+    writeControl    runTime;
+    writeInterval   0.0005;
+    region          solid;
+    regionType      patch;
+    name            outerBottom;
+    operation       areaAverage;
+    fields          (T);
+}
+
+TbaseMax
+{
+    type            surfaceFieldValue;
+    libs            (fieldFunctionObjects);
+    writeControl    runTime;
+    writeInterval   0.0005;
+    region          solid;
+    regionType      patch;
+    name            outerBottom;
+    operation       max;
+    fields          (T);
+}
+
+// ============================================================================
+// 7. FLUJO DE CALOR EN LA INTERFAZ
+// ============================================================================
+
+wallHeatFluxFluid
+{
+    type            wallHeatFlux;
+    libs            (fieldFunctionObjects);
+    region          fluid;
+    patches         (fluid_to_solid);
+    executeControl  writeTime;
+    writeControl    writeTime;
+    log             false;
+}
+
+// ============================================================================
+// 8. DATOS RAW DE LA INTERFAZ
+// ============================================================================
+
+interfaceRaw
+{
+    type            surfaces;
+    libs            (sampling);
+    region          fluid;
+    writeControl    writeTime;
+    surfaceFormat   raw;
+    fields          (T wallHeatFlux);
+
+    surfaces
+    (
+        fluid_to_solid
+        {
+            type        patch;
+            patches     (fluid_to_solid);
+            interpolate false;
+        }
+    );
+}
+
+// ============================================================================
+// El postproceso queda limitado a los observables necesarios para la nueva
+// geometría y malla. Cualquier salida extra debe añadirse solo si se necesita.
+// ============================================================================
+
